@@ -1,5 +1,5 @@
 {
-  "name": "video-transsizer",
+  "name": "video-resizer",
   "private": true,
   "scripts": {
     "build:clean": "turbo run build:clean",

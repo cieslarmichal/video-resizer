@@ -1,5 +1,5 @@
 {
-  "name": "@video-transsizer/backend",
+  "name": "@video-resizer/backend",
   "private": true,
   "type": "module",
   "scripts": {

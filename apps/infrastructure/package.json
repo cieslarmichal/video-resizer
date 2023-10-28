@@ -1,5 +1,5 @@
 {
-  "name": "@video-transsizer/infrastructure",
+  "name": "@video-resizer/infrastructure",
   "type": "module",
   "bin": {
     "app": "./dist/src/app.js"
