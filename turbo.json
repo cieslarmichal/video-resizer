@@ -1,0 +1,29 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "build:clean": {
+      "dependsOn": [],
+      "cache": false
+    },
+    "lint": {
+      "dependsOn": [],
+      "cache": false
+    },
+    "lint:fix": {
+      "dependsOn": [],
+      "cache": false
+    },
+    "test:unit": {
+      "dependsOn": [],
+      "cache": false
+    },
+    "test:integration": {
+      "dependsOn": [],
+      "cache": false
+    }
+  }
+}

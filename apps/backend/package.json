@@ -1,0 +1,26 @@
+{
+  "name": "@video-transsizer/backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start:dev": "node --env-file=.env --inspect --loader ts-node/esm src/index.ts",
+    "build:clean": "rimraf dist",
+    "build": "tsc --build tsconfig.build.json",
+    "build:dev": "tsc --build tsconfig.json",
+    "test:unit": "dotenv -e .env.test -- vitest .unit.test.ts --threads false",
+    "test:integration": "dotenv -e .env.test -- vitest .integration.test.ts --threads false",
+    "lint": "eslint . --ext .ts --cache --max-warnings 0",
+    "lint:fix": "npm run lint -- --fix"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.31.20",
+    "http-status-codes": "^2.3.0",
+    "inversify": "^6.0.2",
+    "pino": "^8.16.1",
+    "pino-pretty": "^10.2.3"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.2.0",
+    "@types/aws-lambda": "^8.10.125"
+  }
+}
