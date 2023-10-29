@@ -1,4 +1,4 @@
-import { type UploadResizedVideoCommandHandler, type ExecutePayload } from './updoadResizedVideoCommandHandler.js';
+import { type UploadResizedVideoCommandHandler, type ExecutePayload } from './uploadResizedVideoCommandHandler.js';
 import { type LoggerService } from '../../../../../libs/logger/services/loggerService/loggerService.js';
 import { type S3Service } from '../../../../../libs/s3/services/s3Service/s3Service.js';
 import { type VideoModuleConfig } from '../../../videoModuleConfig.js';

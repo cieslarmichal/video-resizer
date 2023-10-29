@@ -1,10 +1,15 @@
-import { type UploadResizedVideoCommandHandler } from './application/commandHandlers/uploadResizedVideoCommandHandler/updoadResizedVideoCommandHandler.js';
+import { Video360pQueueController } from './api/queueHandlers/video360pQueueController/video360pQueueController.js';
+import { Video480pQueueController } from './api/queueHandlers/video480pQueueController/video480pQueueController.js';
+import { Video720pQueueController } from './api/queueHandlers/video720pQueueHandler/video720pQueueController.js';
+import { type UploadResizedVideoCommandHandler } from './application/commandHandlers/uploadResizedVideoCommandHandler/uploadResizedVideoCommandHandler.js';
 import { UploadResizedVideoCommandHandlerImpl } from './application/commandHandlers/uploadResizedVideoCommandHandler/uploadResizedVideoCommandHandlerImpl.js';
 import { symbols } from './symbols.js';
 import { type VideoModuleConfig } from './videoModuleConfig.js';
 import { coreSymbols } from '../../core/symbols.js';
 import { type DependencyInjectionContainer } from '../../libs/dependencyInjection/dependencyInjectionContainer.js';
 import { type DependencyInjectionModule } from '../../libs/dependencyInjection/dependencyInjectionModule.js';
+import { type LoggerService } from '../../libs/logger/services/loggerService/loggerService.js';
+import { type S3Service } from '../../libs/s3/services/s3Service/s3Service.js';
 
 export class VideoModule implements DependencyInjectionModule {
   public constructor(private readonly config: VideoModuleConfig) {}
@@ -14,16 +19,38 @@ export class VideoModule implements DependencyInjectionModule {
 
     container.bind<UploadResizedVideoCommandHandler>(
       symbols.uploadResizedVideoCommandHandler,
-      () => new UploadResizedVideoCommandHandlerImpl(container.get<EncoderService>(symbols.encoderService)),
+      () =>
+        new UploadResizedVideoCommandHandlerImpl(
+          container.get<S3Service>(coreSymbols.s3Service),
+          container.get<VideoModuleConfig>(symbols.videoModuleConfig),
+          container.get<LoggerService>(coreSymbols.loggerService),
+        ),
     );
 
-    container.bind<UrlHttpController>(
-      symbols.urlHttpController,
+    container.bind<Video360pQueueController>(
+      symbols.video360pQueueController,
       () =>
-        new UrlHttpController(
-          container.get<CreateUrlRecordCommandHandler>(symbols.createUrlRecordCommandHandler),
-          container.get<FindLongUrlQueryHandler>(symbols.findLongUrlQueryHandler),
-          container.get<UrlModuleConfig>(symbols.urlModuleConfig),
+        new Video360pQueueController(
+          container.get<UploadResizedVideoCommandHandler>(symbols.uploadResizedVideoCommandHandler),
+          container.get<LoggerService>(coreSymbols.loggerService),
+        ),
+    );
+
+    container.bind<Video480pQueueController>(
+      symbols.video480pQueueController,
+      () =>
+        new Video480pQueueController(
+          container.get<UploadResizedVideoCommandHandler>(symbols.uploadResizedVideoCommandHandler),
+          container.get<LoggerService>(coreSymbols.loggerService),
+        ),
+    );
+
+    container.bind<Video720pQueueController>(
+      symbols.video480pQueueController,
+      () =>
+        new Video720pQueueController(
+          container.get<UploadResizedVideoCommandHandler>(symbols.uploadResizedVideoCommandHandler),
+          container.get<LoggerService>(coreSymbols.loggerService),
         ),
     );
   }
