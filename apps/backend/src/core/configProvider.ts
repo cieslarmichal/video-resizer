@@ -1,5 +1,3 @@
-import { Assert } from '../common/validation/assert.js';
-import { Validator } from '../common/validation/validator.js';
 import { EnvParser } from '../libs/envParser/envParser.js';
 import { LoggerLevel } from '../libs/logger/types/loggerLevel.js';
 
@@ -25,22 +23,6 @@ export class ConfigProvider {
 
   public static getLoggerLevel(): LoggerLevel {
     return this.getEnumEnvVariable(LoggerLevel, 'LOGGER_LEVEL');
-  }
-
-  public static getServerHost(): string {
-    return EnvParser.parseString({ name: 'SERVER_HOST' }) || '0.0.0.0';
-  }
-
-  public static getServerPort(): number {
-    const envVariable = 'SERVER_PORT';
-
-    const serverPort = EnvParser.parseNumber({ name: envVariable });
-
-    if (!Validator.isNumber(serverPort)) {
-      return 8080;
-    }
-
-    return serverPort;
   }
 
   public static getMongoDatabaseUri(): string {
