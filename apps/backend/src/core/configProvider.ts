@@ -1,3 +1,4 @@
+import { Assert } from '../common/validation/assert.js';
 import { EnvParser } from '../libs/envParser/envParser.js';
 import { LoggerLevel } from '../libs/logger/types/loggerLevel.js';
 
@@ -25,19 +26,7 @@ export class ConfigProvider {
     return this.getEnumEnvVariable(LoggerLevel, 'LOGGER_LEVEL');
   }
 
-  public static getMongoDatabaseUri(): string {
-    return this.getStringEnvVariable('MONGO_DATABASE_URI');
-  }
-
-  public static getDomainUrl(): string {
-    return this.getStringEnvVariable('DOMAIN_URL');
-  }
-
-  public static getKafkaBroker(): string {
-    return this.getStringEnvVariable('KAFKA_BROKER');
-  }
-
-  public static getKafkaClientId(): string {
-    return 'url-shortener-app';
+  public static getS3BucketName(): string {
+    return this.getStringEnvVariable('S3_BUCKET_NAME');
   }
 }
