@@ -1,4 +1,5 @@
-import { CreateUrlRecordCommandHandlerImpl } from './application/commandHandlers/resizeVideoCommandHandler/resizeVideoCommandHandlerImpl.js';
+import { type UploadResizedVideoCommandHandler } from './application/commandHandlers/uploadResizedVideoCommandHandler/updoadResizedVideoCommandHandler.js';
+import { UploadResizedVideoCommandHandlerImpl } from './application/commandHandlers/uploadResizedVideoCommandHandler/uploadResizedVideoCommandHandlerImpl.js';
 import { symbols } from './symbols.js';
 import { type VideoModuleConfig } from './videoModuleConfig.js';
 import { coreSymbols } from '../../core/symbols.js';
@@ -11,9 +12,9 @@ export class VideoModule implements DependencyInjectionModule {
   public declareBindings(container: DependencyInjectionContainer): void {
     container.bindToValue<VideoModuleConfig>(symbols.videoModuleConfig, this.config);
 
-    container.bind<CreateUrlRecordCommandHandler>(
-      symbols.resizeVideoCommandHandler,
-      () => new CreateUrlRecordCommandHandlerImpl(container.get<EncoderService>(symbols.encoderService)),
+    container.bind<UploadResizedVideoCommandHandler>(
+      symbols.uploadResizedVideoCommandHandler,
+      () => new UploadResizedVideoCommandHandlerImpl(container.get<EncoderService>(symbols.encoderService)),
     );
 
     container.bind<UrlHttpController>(

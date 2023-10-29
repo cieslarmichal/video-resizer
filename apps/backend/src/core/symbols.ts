@@ -1,11 +1,11 @@
 export const symbols = {
   loggerService: Symbol('loggerService'),
   uuidService: Symbol('uuidService'),
-  kafkaProducerService: Symbol('kafkaProducerService'),
+  s3Service: Symbol('s3Service'),
 };
 
 export const coreSymbols = {
   loggerService: symbols.loggerService,
   uuidService: symbols.uuidService,
-  kafkaProducerService: symbols.kafkaProducerService,
+  s3Service: symbols.s3Service,
 };

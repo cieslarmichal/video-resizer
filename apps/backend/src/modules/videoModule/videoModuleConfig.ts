@@ -1,3 +1,3 @@
 export interface VideoModuleConfig {
-  readonly s3BucketName: string;
+  readonly s3ResizedVideosBucketName: string;
 }

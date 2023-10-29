@@ -1,3 +1,4 @@
+import { AwsRegion } from '../common/types/awsRegion.js';
 import { Assert } from '../common/validation/assert.js';
 import { EnvParser } from '../libs/envParser/envParser.js';
 import { LoggerLevel } from '../libs/logger/types/loggerLevel.js';
@@ -26,7 +27,11 @@ export class ConfigProvider {
     return this.getEnumEnvVariable(LoggerLevel, 'LOGGER_LEVEL');
   }
 
-  public static getS3BucketName(): string {
-    return this.getStringEnvVariable('S3_BUCKET_NAME');
+  public static getS3ResizedVideosBucketName(): string {
+    return this.getStringEnvVariable('S3_RESIZED_VIDEOS_BUCKET_NAME');
+  }
+
+  public static getAwsRegion(): AwsRegion {
+    return this.getEnumEnvVariable(AwsRegion, 'AWS_REGION');
   }
 }

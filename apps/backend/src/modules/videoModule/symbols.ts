@@ -1,6 +1,6 @@
 export const symbols = {
   videoModuleConfig: Symbol('videoModuleConfig'),
-  resizeVideoCommandHandler: Symbol('resizeVideoCommandHandler'),
+  uploadResizedVideoCommandHandler: Symbol('uploadResizedVideoCommandHandler'),
   video360pQueueController: Symbol('video360pQueueController'),
   video480pQueueController: Symbol('video480pQueueController'),
   video720pQueueController: Symbol('video720pQueueController'),

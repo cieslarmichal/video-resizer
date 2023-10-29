@@ -5,17 +5,21 @@ import { DependencyInjectionContainerFactory } from '../libs/dependencyInjection
 import { type DependencyInjectionModule } from '../libs/dependencyInjection/dependencyInjectionModule.js';
 import { LoggerServiceFactory } from '../libs/logger/factories/loggerServiceFactory/loggerServiceFactory.js';
 import { type LoggerService } from '../libs/logger/services/loggerService/loggerService.js';
+import { S3ServiceFactory } from '../libs/s3/factories/s3ServiceFactory/s3ServiceFactory.js';
+import { type S3Service } from '../libs/s3/services/s3Service/s3Service.js';
 import { VideoModule } from '../modules/videoModule/videoModule.js';
 
 export class Application {
   public static createContainer(): DependencyInjectionContainer {
     const loggerLevel = ConfigProvider.getLoggerLevel();
 
-    const s3BucketName = ConfigProvider.getS3BucketName();
+    const s3ResizedVideosBucketName = ConfigProvider.getS3ResizedVideosBucketName();
+
+    const awsRegion = ConfigProvider.getAwsRegion();
 
     const modules: DependencyInjectionModule[] = [
       new VideoModule({
-        s3BucketName,
+        s3ResizedVideosBucketName,
       }),
     ];
 
@@ -23,7 +27,7 @@ export class Application {
 
     container.bind<LoggerService>(symbols.loggerService, () => LoggerServiceFactory.create({ loggerLevel }));
 
-    container.bind<LoggerService>(symbols.loggerService, () => LoggerServiceFactory.create({ loggerLevel }));
+    container.bind<S3Service>(symbols.s3Service, () => S3ServiceFactory.create({ region: awsRegion }));
 
     return container;
   }
