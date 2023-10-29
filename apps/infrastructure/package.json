@@ -8,8 +8,6 @@
   "scripts": {
     "build:clean": "rimraf dist",
     "build": "tsc --build tsconfig.build.json",
-    "test": "vitest",
-    "test:watch": "npm run test -- --watch",
     "deploy": "cdk deploy",
     "deploy:all": "cdk deploy --all --require-approval never",
     "deploy:prepare": "cdk bootstrap --require-approval never",
