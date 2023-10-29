@@ -13,17 +13,25 @@ export class VideoProcessingStack extends core.Stack {
   public constructor(scope: core.App, id: string, props: core.StackProps) {
     super(scope, id, props);
 
-    const s3Bucket = new s3.Bucket(this, 'videos', {
-      objectOwnership: s3.ObjectOwnership.BUCKET_OWNER_ENFORCED,
+    const s3VideosBucket = new s3.Bucket(this, 'VideosBucket', {
+      bucketName: 'videos',
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      encryptionKey: new kms.Key(this, 's3BucketKMSKey'),
+      encryptionKey: new kms.Key(this, 'VideosBucketKMSKey'),
+      removalPolicy: core.RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+    });
+
+    const s3ResizedVideosBucket = new s3.Bucket(this, 'ResizedVideosBucket', {
+      bucketName: 'resized-videos',
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      encryptionKey: new kms.Key(this, 'ResizedVideosBucketKMSKey'),
       removalPolicy: core.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
     });
 
     const topic = new sns.Topic(this, 'CreatedVideos');
 
-    s3Bucket.addEventNotification(s3.EventType.OBJECT_CREATED, new s3n.SnsDestination(topic));
+    s3VideosBucket.addEventNotification(s3.EventType.OBJECT_CREATED, new s3n.SnsDestination(topic));
 
     const resizeVideoTo360pQueue = new sqs.Queue(this, 'ResizeVideoTo360pQueue', {
       queueName: 'ResizeVideoTo360pQueue',
@@ -47,7 +55,7 @@ export class VideoProcessingStack extends core.Stack {
     topic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo720pQueue));
 
     const lambdaEnvironment = {
-      ['S3_BUCKET_NAME']: s3Bucket.bucketName,
+      ['S3_RESIZED_VIDEOS_BUCKET_NAME']: s3ResizedVideosBucket.bucketName,
     };
 
     const createLambdaEntryPath = (path: string): string => {
@@ -59,7 +67,9 @@ export class VideoProcessingStack extends core.Stack {
       environment: lambdaEnvironment,
     });
 
-    s3Bucket.grantRead(resizeVideoTo360pLambda);
+    s3VideosBucket.grantRead(resizeVideoTo360pLambda);
+
+    s3ResizedVideosBucket.grantRead(resizeVideoTo360pLambda);
 
     resizeVideoTo360pLambda.addEventSource(
       new lambdaSources.SqsEventSource(resizeVideoTo360pQueue, {
@@ -72,7 +82,9 @@ export class VideoProcessingStack extends core.Stack {
       environment: lambdaEnvironment,
     });
 
-    s3Bucket.grantRead(resizeVideoTo480pLambda);
+    s3VideosBucket.grantRead(resizeVideoTo480pLambda);
+
+    s3ResizedVideosBucket.grantRead(resizeVideoTo480pLambda);
 
     resizeVideoTo480pLambda.addEventSource(
       new lambdaSources.SqsEventSource(resizeVideoTo480pQueue, {
@@ -85,7 +97,9 @@ export class VideoProcessingStack extends core.Stack {
       environment: lambdaEnvironment,
     });
 
-    s3Bucket.grantRead(resizeVideoTo720pLambda);
+    s3VideosBucket.grantRead(resizeVideoTo720pLambda);
+
+    s3ResizedVideosBucket.grantRead(resizeVideoTo720pLambda);
 
     resizeVideoTo720pLambda.addEventSource(
       new lambdaSources.SqsEventSource(resizeVideoTo720pQueue, {
