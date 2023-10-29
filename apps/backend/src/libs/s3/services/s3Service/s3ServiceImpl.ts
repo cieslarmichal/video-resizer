@@ -4,6 +4,7 @@ import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 
 import { type DownloadObjectPayload, type S3Service, type UploadObjectPayload } from './s3Service.js';
 import { type S3Client } from '../../clients/s3Client/s3Client.js';
+import { S3ServiceError } from '../../errors/s3ServiceError.js';
 
 export class S3ServiceImpl implements S3Service {
   public constructor(private readonly s3Client: S3Client) {}
@@ -20,7 +21,7 @@ export class S3ServiceImpl implements S3Service {
     await this.s3Client.send(command);
   }
 
-  public async downloadObject(payload: DownloadObjectPayload): Promise<void> {
+  public async downloadObject(payload: DownloadObjectPayload): Promise<ReadableStream | undefined> {
     const { bucketName, objectKey } = payload;
 
     const command = new GetObjectCommand({
@@ -28,6 +29,15 @@ export class S3ServiceImpl implements S3Service {
       Key: objectKey,
     });
 
-    await this.s3Client.send(command);
+    try {
+      const result = await this.s3Client.send(command);
+
+      return result.Body as ReadableStream | undefined;
+    } catch (error) {
+      throw new S3ServiceError({
+        bucket: bucketName,
+        objectKey,
+      });
+    }
   }
 }

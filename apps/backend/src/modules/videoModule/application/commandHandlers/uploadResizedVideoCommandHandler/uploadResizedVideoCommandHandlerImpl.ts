@@ -16,6 +16,29 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
     const { s3ResizedVideosBucketName: targetBucket } = this.config;
 
     this.loggerService.debug({
+      message: 'Fetching source video...',
+      context: {
+        sourceBucket,
+        sourceObjectKey,
+      },
+    });
+
+    const data = await this.s3Service.downloadObject({
+      bucketName: sourceBucket,
+      objectKey: sourceObjectKey,
+    });
+
+    fs.writeFileSync('downloadedFile.txt', data.Body);
+
+    this.loggerService.info({
+      message: 'Source video fetched.',
+      context: {
+        sourceBucket,
+        sourceObjectKey,
+      },
+    });
+
+    this.loggerService.debug({
       message: 'Resizing video...',
       context: {
         sourceBucket,

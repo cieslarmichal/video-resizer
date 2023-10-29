@@ -11,5 +11,5 @@ export interface DownloadObjectPayload {
 
 export interface S3Service {
   uploadObject(payload: UploadObjectPayload): Promise<void>;
-  downloadObject(payload: DownloadObjectPayload): Promise<void>;
+  downloadObject(payload: DownloadObjectPayload): Promise<ReadableStream | undefined>;
 }
