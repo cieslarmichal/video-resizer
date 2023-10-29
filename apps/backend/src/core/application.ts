@@ -9,17 +9,13 @@ import { VideoModule } from '../modules/videoModule/videoModule.js';
 
 export class Application {
   public static createContainer(): DependencyInjectionContainer {
-    const domainUrl = ConfigProvider.getDomainUrl();
-
     const loggerLevel = ConfigProvider.getLoggerLevel();
 
-    const kafkaBroker = ConfigProvider.getKafkaBroker();
-
-    const kafkaClientId = ConfigProvider.getKafkaClientId();
+    const s3BucketName = ConfigProvider.getS3BucketName();
 
     const modules: DependencyInjectionModule[] = [
       new VideoModule({
-        domainUrl,
+        s3BucketName,
       }),
     ];
 
@@ -27,14 +23,7 @@ export class Application {
 
     container.bind<LoggerService>(symbols.loggerService, () => LoggerServiceFactory.create({ loggerLevel }));
 
-    container.bind<UuidService>(symbols.uuidService, () => new UuidServiceImpl());
-
-    container.bind<KafkaProducerService>(symbols.kafkaProducerService, () =>
-      KafkaProducerServiceFactory.create({
-        broker: kafkaBroker,
-        clientId: kafkaClientId,
-      }),
-    );
+    container.bind<LoggerService>(symbols.loggerService, () => LoggerServiceFactory.create({ loggerLevel }));
 
     return container;
   }
