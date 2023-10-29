@@ -1,14 +1,13 @@
 export const symbols = {
-  urlModuleConfig: Symbol('urlModuleConfig'),
-  urlRecordMapper: Symbol('urlRecordMapper'),
-  urlRecordRepository: Symbol('urlRecordRepository'),
-  hashService: Symbol('hashService'),
-  encoderService: Symbol('encoderService'),
-  createUrlRecordCommandHandler: Symbol('createUrlRecordCommandHandler'),
-  findLongUrlQueryHandler: Symbol('findLongUrlQueryHandler'),
-  urlHttpController: Symbol('urlHttpController'),
+  videoModuleConfig: Symbol('videoModuleConfig'),
+  resizeVideoCommandHandler: Symbol('resizeVideoCommandHandler'),
+  video360pQueueController: Symbol('video360pQueueController'),
+  video480pQueueController: Symbol('video480pQueueController'),
+  video720pQueueController: Symbol('video720pQueueController'),
 };
 
-export const urlSymbols = {
-  urlHttpController: symbols.urlHttpController,
+export const videoSymbols = {
+  video360pQueueController: symbols.video360pQueueController,
+  video480pQueueController: symbols.video480pQueueController,
+  video720pQueueController: symbols.video720pQueueController,
 };

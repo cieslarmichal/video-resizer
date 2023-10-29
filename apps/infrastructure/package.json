@@ -2,7 +2,7 @@
   "name": "@video-resizer/infrastructure",
   "type": "module",
   "bin": {
-    "app": "./dist/src/app.js"
+    "app": "./dist/src/application.js"
   },
   "private": true,
   "scripts": {
