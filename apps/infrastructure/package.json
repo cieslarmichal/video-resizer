@@ -8,11 +8,11 @@
   "scripts": {
     "build:clean": "rimraf dist",
     "build": "tsc --build tsconfig.build.json",
-    "deploy": "cdk deploy",
-    "deploy:all": "cdk deploy --all --require-approval never",
-    "deploy:prepare": "cdk bootstrap --require-approval never",
-    "destroy": "cdk destroy",
-    "destroy:all": "npm run destroy -- --all --require-approval never"
+    "deploy": "dotenv -e .env cdk deploy",
+    "deploy:all": "dotenv -e .env cdk deploy --all --require-approval never",
+    "deploy:prepare": "dotenv -e .env -- cdk bootstrap --require-approval never",
+    "destroy": "dotenv -e .env -- cdk destroy",
+    "destroy:all": "dotenv -e .env -- npm run destroy -- --all --require-approval never"
   },
   "dependencies": {
     "@aws-cdk/aws-lambda": "^1.204.0",

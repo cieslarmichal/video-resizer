@@ -7,14 +7,14 @@ import * as sns from 'aws-cdk-lib/aws-sns';
 import * as snsSubscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
 
-import { NodejsLambdaFunction } from '../../common/nodejsLambdaFunction';
+import { NodejsLambdaFunction } from '../../common/nodejsLambdaFunction.js';
 
 export class VideoProcessingStack extends core.Stack {
   public constructor(scope: core.App, id: string, props: core.StackProps) {
     super(scope, id, props);
 
     const s3VideosBucket = new s3.Bucket(this, 'VideosBucket', {
-      bucketName: 'videos',
+      bucketName: 'videos-433862147055',
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryptionKey: new kms.Key(this, 'VideosBucketKMSKey'),
       removalPolicy: core.RemovalPolicy.DESTROY,
@@ -22,7 +22,7 @@ export class VideoProcessingStack extends core.Stack {
     });
 
     const s3ResizedVideosBucket = new s3.Bucket(this, 'ResizedVideosBucket', {
-      bucketName: 'resized-videos',
+      bucketName: 'resized-videos-433862147055',
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryptionKey: new kms.Key(this, 'ResizedVideosBucketKMSKey'),
       removalPolicy: core.RemovalPolicy.DESTROY,
@@ -35,21 +35,21 @@ export class VideoProcessingStack extends core.Stack {
 
     const resizeVideoTo360pQueue = new sqs.Queue(this, 'ResizeVideoTo360pQueue', {
       queueName: 'ResizeVideoTo360pQueue',
-      visibilityTimeout: core.Duration.seconds(30),
+      visibilityTimeout: core.Duration.seconds(65),
     });
 
     topic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo360pQueue));
 
     const resizeVideoTo480pQueue = new sqs.Queue(this, 'ResizeVideoTo480pQueue', {
       queueName: 'ResizeVideoTo480pQueue',
-      visibilityTimeout: core.Duration.seconds(30),
+      visibilityTimeout: core.Duration.seconds(65),
     });
 
     topic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo480pQueue));
 
     const resizeVideoTo720pQueue = new sqs.Queue(this, 'ResizeVideoTo720pQueue', {
       queueName: 'ResizeVideoTo720pQueue',
-      visibilityTimeout: core.Duration.seconds(30),
+      visibilityTimeout: core.Duration.seconds(65),
     });
 
     topic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo720pQueue));

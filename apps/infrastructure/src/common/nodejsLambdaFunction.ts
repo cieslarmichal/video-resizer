@@ -19,7 +19,7 @@ export class NodejsLambdaFunction extends NodejsFunction {
       memorySize: 1024,
       tracing: lambda.Tracing.ACTIVE,
       awsSdkConnectionReuse: true,
-      timeout: core.Duration.minutes(15),
+      timeout: core.Duration.seconds(60),
       logRetention: logs.RetentionDays.THREE_DAYS,
       ...props,
     });
