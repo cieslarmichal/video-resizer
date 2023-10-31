@@ -7,9 +7,10 @@ export interface UploadObjectPayload {
 export interface DownloadObjectPayload {
   readonly bucketName: string;
   readonly objectKey: string;
+  readonly destinationPath: string;
 }
 
 export interface S3Service {
   uploadObject(payload: UploadObjectPayload): Promise<void>;
-  downloadObject(payload: DownloadObjectPayload): Promise<ReadableStream | undefined>;
+  downloadObject(payload: DownloadObjectPayload): Promise<void>;
 }

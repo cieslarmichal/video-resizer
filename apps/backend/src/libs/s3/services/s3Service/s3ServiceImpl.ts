@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { createWriteStream } from 'node:fs';
+import { Readable } from 'node:stream';
 
 import { type DownloadObjectPayload, type S3Service, type UploadObjectPayload } from './s3Service.js';
 import { type S3Client } from '../../clients/s3Client/s3Client.js';
@@ -18,11 +20,18 @@ export class S3ServiceImpl implements S3Service {
       Body: data,
     });
 
-    await this.s3Client.send(command);
+    try {
+      await this.s3Client.send(command);
+    } catch (error) {
+      throw new S3ServiceError({
+        bucket: bucketName,
+        objectKey,
+      });
+    }
   }
 
-  public async downloadObject(payload: DownloadObjectPayload): Promise<ReadableStream | undefined> {
-    const { bucketName, objectKey } = payload;
+  public async downloadObject(payload: DownloadObjectPayload): Promise<void> {
+    const { bucketName, objectKey, destinationPath } = payload;
 
     const command = new GetObjectCommand({
       Bucket: bucketName,
@@ -32,7 +41,13 @@ export class S3ServiceImpl implements S3Service {
     try {
       const result = await this.s3Client.send(command);
 
-      return result.Body as ReadableStream | undefined;
+      const body = result.Body;
+
+      if (body instanceof Readable) {
+        const writeStream = createWriteStream(destinationPath);
+
+        body.pipe(writeStream);
+      }
     } catch (error) {
       throw new S3ServiceError({
         bucket: bucketName,

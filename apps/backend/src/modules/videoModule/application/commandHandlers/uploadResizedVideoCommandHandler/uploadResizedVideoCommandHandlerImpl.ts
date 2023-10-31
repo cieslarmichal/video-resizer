@@ -23,18 +23,20 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
       },
     });
 
-    const data = await this.s3Service.downloadObject({
+    const destinationPath = `/tmp/${sourceObjectKey}`;
+
+    await this.s3Service.downloadObject({
       bucketName: sourceBucket,
       objectKey: sourceObjectKey,
+      destinationPath,
     });
-
-    fs.writeFileSync('downloadedFile.txt', data.Body);
 
     this.loggerService.info({
       message: 'Source video fetched.',
       context: {
         sourceBucket,
         sourceObjectKey,
+        destinationPath,
       },
     });
 
