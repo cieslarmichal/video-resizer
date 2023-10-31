@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  localstack:
+    image: localstack/localstack
+    ports:
+      - '127.0.0.1:4566:4566'
+      - '127.0.0.1:4510-4559:4510-4559'
+    environment:
+      AWS_DEFAULT_REGION: eu-central1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_ENDPOINT: http://127.0.0.1:4566
+      DEBUG: 1
+      DOCKER_HOST: unix:///var/run/docker.sock
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - ./localstack/localstack-setup.sh:/etc/localstack/init/ready.d/localstack-setup.sh
