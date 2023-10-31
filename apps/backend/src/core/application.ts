@@ -15,6 +15,8 @@ export class Application {
 
     const s3ResizedVideosBucket = ConfigProvider.getS3ResizedVideosBucket();
 
+    const s3Endpoint = ConfigProvider.getS3Endpoint();
+
     const awsRegion = ConfigProvider.getAwsRegion();
 
     const modules: DependencyInjectionModule[] = [new VideoModule({ s3ResizedVideosBucket })];
@@ -23,7 +25,12 @@ export class Application {
 
     container.bind<LoggerService>(symbols.loggerService, () => LoggerServiceFactory.create({ loggerLevel }));
 
-    container.bind<S3Service>(symbols.s3Service, () => S3ServiceFactory.create({ region: awsRegion }));
+    container.bind<S3Service>(symbols.s3Service, () =>
+      S3ServiceFactory.create({
+        region: awsRegion,
+        endpoint: s3Endpoint,
+      }),
+    );
 
     return container;
   }
