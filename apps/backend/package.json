@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^8.2.0",
-    "@types/aws-lambda": "^8.10.125"
+    "@types/aws-lambda": "^8.10.125",
+    "@types/fluent-ffmpeg": "^2.1.23"
   }
 }

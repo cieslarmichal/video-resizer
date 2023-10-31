@@ -1,7 +1,9 @@
+import { type Readable } from 'node:stream';
+
 export interface UploadObjectPayload {
   readonly bucketName: string;
   readonly objectKey: string;
-  readonly data: Buffer;
+  readonly data: Readable;
 }
 
 export interface DownloadObjectPayload {
