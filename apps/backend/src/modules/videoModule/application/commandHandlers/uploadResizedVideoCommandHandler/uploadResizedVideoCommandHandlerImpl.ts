@@ -3,6 +3,7 @@
 import ffmpegPath from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
 import { createWriteStream } from 'node:fs';
+import path from 'node:path';
 
 import { type UploadResizedVideoCommandHandler, type ExecutePayload } from './uploadResizedVideoCommandHandler.js';
 import { VideoResolution } from '../../../../../common/types/videoResolution.js';
@@ -49,7 +50,9 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
       },
     });
 
-    const s3ResizedVideoKey = s3VideoKey.replace('.mp4', '') + `-${targetResolution}.mp4`;
+    const parsedVideoPath = path.parse(s3VideoKey);
+
+    const s3ResizedVideoKey = `${parsedVideoPath.name}-${targetResolution}${parsedVideoPath.ext}`;
 
     const resizedVideoPath = `/tmp/${s3ResizedVideoKey}`;
 
