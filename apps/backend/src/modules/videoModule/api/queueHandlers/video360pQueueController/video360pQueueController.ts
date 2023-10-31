@@ -60,9 +60,9 @@ export class Video360pQueueController {
         }
 
         await this.uploadResizedVideoCommandHandler.execute({
-          s3VideosBucketName: bucket,
-          s3VideoObjectKey: objectKey,
-          targetVideoResolution: VideoResolution.standardDefinition360,
+          s3VideosBucket: bucket,
+          s3VideoKey: objectKey,
+          targetResolution: VideoResolution.standardDefinition360,
         });
 
         this.loggerService.debug({

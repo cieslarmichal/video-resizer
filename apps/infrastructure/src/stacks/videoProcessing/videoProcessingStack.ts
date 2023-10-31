@@ -55,7 +55,7 @@ export class VideoProcessingStack extends core.Stack {
     topic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo720pQueue));
 
     const lambdaEnvironment = {
-      ['S3_RESIZED_VIDEOS_BUCKET_NAME']: s3ResizedVideosBucket.bucketName,
+      ['S3_RESIZED_VIDEOS_BUCKET']: s3ResizedVideosBucket.bucketName,
     };
 
     const createLambdaEntryPath = (path: string): string => {

@@ -60,9 +60,9 @@ export class Video480pQueueController {
         }
 
         await this.uploadResizedVideoCommandHandler.execute({
-          s3VideosBucketName: bucket,
-          s3VideoObjectKey: objectKey,
-          targetVideoResolution: VideoResolution.standardDefinition480,
+          s3VideosBucket: bucket,
+          s3VideoKey: objectKey,
+          targetResolution: VideoResolution.standardDefinition480,
         });
 
         this.loggerService.debug({

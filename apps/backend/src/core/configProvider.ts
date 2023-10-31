@@ -27,8 +27,8 @@ export class ConfigProvider {
     return this.getEnumEnvVariable(LoggerLevel, 'LOGGER_LEVEL');
   }
 
-  public static getS3ResizedVideosBucketName(): string {
-    return this.getStringEnvVariable('S3_RESIZED_VIDEOS_BUCKET_NAME');
+  public static getS3ResizedVideosBucket(): string {
+    return this.getStringEnvVariable('S3_RESIZED_VIDEOS_BUCKET');
   }
 
   public static getAwsRegion(): AwsRegion {

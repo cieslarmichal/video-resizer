@@ -1,18 +1,17 @@
 import { type Readable } from 'node:stream';
 
-export interface UploadObjectPayload {
-  readonly bucketName: string;
+export interface PutObjectPayload {
+  readonly bucket: string;
   readonly objectKey: string;
   readonly data: Readable;
 }
 
-export interface DownloadObjectPayload {
-  readonly bucketName: string;
+export interface GetObjectPayload {
+  readonly bucket: string;
   readonly objectKey: string;
-  readonly destinationPath: string;
 }
 
 export interface S3Service {
-  uploadObject(payload: UploadObjectPayload): Promise<void>;
-  downloadObject(payload: DownloadObjectPayload): Promise<void>;
+  putObject(payload: PutObjectPayload): Promise<void>;
+  getObject(payload: GetObjectPayload): Promise<ReadableStream | undefined>;
 }

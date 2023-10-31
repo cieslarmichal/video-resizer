@@ -4,10 +4,29 @@ import ffmpeg from 'fluent-ffmpeg';
 import { createReadStream, createWriteStream } from 'node:fs';
 
 import { type UploadResizedVideoCommandHandler, type ExecutePayload } from './uploadResizedVideoCommandHandler.js';
+import { ResourceNotFoundError } from '../../../../../common/errors/common/resourceNotFoundError.js';
 import { VideoResolution } from '../../../../../common/types/videoResolution.js';
 import { type LoggerService } from '../../../../../libs/logger/services/loggerService/loggerService.js';
 import { type S3Service } from '../../../../../libs/s3/services/s3Service/s3Service.js';
 import { type VideoModuleConfig } from '../../../videoModuleConfig.js';
+
+interface DownloadVideoPayload {
+  readonly s3VideosBucket: string;
+  readonly s3VideoKey: string;
+  readonly destinationPath: string;
+}
+
+interface ResizeVideoPayload {
+  readonly sourcePath: string;
+  readonly destinationPath: string;
+  readonly targetResolution: VideoResolution;
+}
+
+interface UploadVideoPayload {
+  readonly s3VideosBucket: string;
+  readonly s3VideoKey: string;
+  readonly sourcePath: string;
+}
 
 export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoCommandHandler {
   private readonly videoResolutionToResolutionWidthMapping = new Map<VideoResolution, number>([
@@ -23,90 +42,129 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
   ) {}
 
   public async execute(payload: ExecutePayload): Promise<void> {
-    const { s3VideosBucketName: sourceBucket, s3VideoObjectKey: sourceObjectKey, targetVideoResolution } = payload;
+    const { s3VideosBucket, s3VideoKey, targetResolution } = payload;
 
-    const { s3ResizedVideosBucketName: targetBucket } = this.config;
+    const { s3ResizedVideosBucket } = this.config;
 
-    this.loggerService.debug({
-      message: 'Fetching video...',
-      context: {
-        sourceBucket,
-        sourceObjectKey,
-      },
-    });
+    const videoPath = `/tmp/${s3VideoKey}`;
 
-    const videoPath = `/tmp/${sourceObjectKey}`;
-
-    await this.s3Service.downloadObject({
-      bucketName: sourceBucket,
-      objectKey: sourceObjectKey,
+    await this.downloadVideo({
+      s3VideosBucket,
+      s3VideoKey,
       destinationPath: videoPath,
     });
 
-    this.loggerService.info({
-      message: 'Video fetched.',
+    const s3ResizedVideoKey = s3VideoKey.replace('.mp4', '') + `-${targetResolution}.mp4`;
+
+    const resizedVideoPath = `/tmp/${s3ResizedVideoKey}`;
+
+    await this.resizeVideo({
+      sourcePath: videoPath,
+      destinationPath: resizedVideoPath,
+      targetResolution,
+    });
+
+    await this.uploadVideo({
+      s3VideosBucket: s3ResizedVideosBucket,
+      s3VideoKey: s3ResizedVideoKey,
+      sourcePath: resizedVideoPath,
+    });
+  }
+
+  private async downloadVideo(payload: DownloadVideoPayload): Promise<void> {
+    const { s3VideosBucket, s3VideoKey, destinationPath } = payload;
+
+    this.loggerService.debug({
+      message: 'Downloading video...',
       context: {
-        sourceBucket,
-        sourceObjectKey,
-        videoPath,
+        s3VideosBucket,
+        s3VideoKey,
+        destinationPath,
       },
     });
+
+    const videoData = await this.s3Service.getObject({
+      bucket: s3VideosBucket,
+      objectKey: s3VideoKey,
+    });
+
+    if (!videoData) {
+      throw new ResourceNotFoundError({
+        name: 'S3Object',
+        bucket: s3VideosBucket,
+        objectKey: s3VideoKey,
+      });
+    }
+
+    const writeStream = createWriteStream(destinationPath);
+
+    videoData.pipeTo(writeStream);
+
+    this.loggerService.info({
+      message: 'Video downloaded.',
+      context: {
+        bucket: s3VideosBucket,
+        objectKey: s3VideoKey,
+        videoPath: destinationPath,
+      },
+    });
+  }
+
+  private async resizeVideo(payload: ResizeVideoPayload): Promise<void> {
+    const { sourcePath, destinationPath, targetResolution } = payload;
 
     this.loggerService.debug({
       message: 'Resizing video...',
       context: {
-        sourceBucket,
-        sourceObjectKey,
-        targetVideoResolution,
-        videoPath,
+        sourcePath,
+        destinationPath,
+        targetResolution,
       },
     });
 
     ffmpeg.setFfmpegPath(ffmpegPath as unknown as string);
 
-    const resolutionWidth = this.videoResolutionToResolutionWidthMapping.get(targetVideoResolution) as number;
-
-    const targetObjectKey = sourceObjectKey.replace('.mp4', '') + `-${resolutionWidth}.mp4`;
-
-    const resizedVideoPath = `/tmp/${targetObjectKey}`;
+    const resolutionWidth = this.videoResolutionToResolutionWidthMapping.get(targetResolution) as number;
 
     ffmpeg()
-      .input(videoPath)
+      .input(sourcePath)
       .outputOptions('-vf', `scale=-2:${resolutionWidth}`)
-      .pipe(createWriteStream(resizedVideoPath));
+      .pipe(createWriteStream(destinationPath));
 
     this.loggerService.info({
       message: 'Video resized.',
       context: {
-        sourceBucket,
-        sourceObjectKey,
-        targetVideoResolution,
-        videoPath,
-        resizedVideoPath,
+        sourcePath,
+        destinationPath,
+        targetResolution,
       },
     });
+  }
+
+  private async uploadVideo(payload: UploadVideoPayload): Promise<void> {
+    const { s3VideosBucket, s3VideoKey, sourcePath } = payload;
 
     this.loggerService.debug({
       message: 'Uploading video...',
       context: {
-        targetObjectKey,
-        targetBucket,
-        resizedVideoPath,
+        targetBucket: s3VideosBucket,
+        targetObjectKey: s3VideoKey,
+        sourcePath,
       },
     });
 
-    await this.s3Service.uploadObject({
-      bucketName: sourceBucket,
-      objectKey: sourceObjectKey,
-      data: createReadStream(resizedVideoPath),
+    await this.s3Service.putObject({
+      bucket: s3VideosBucket,
+      objectKey: s3VideoKey,
+      data: createReadStream(sourcePath),
     });
 
     this.loggerService.info({
       message: 'Video uploaded.',
       context: {
-        targetObjectKey,
-        targetBucket,
-        resizedVideoPath,
+        targetBucket: s3VideosBucket,
+        targetObjectKey: s3VideoKey,
+        sourcePath,
       },
     });
   }

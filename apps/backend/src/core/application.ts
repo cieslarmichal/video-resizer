@@ -13,15 +13,11 @@ export class Application {
   public static createContainer(): DependencyInjectionContainer {
     const loggerLevel = ConfigProvider.getLoggerLevel();
 
-    const s3ResizedVideosBucketName = ConfigProvider.getS3ResizedVideosBucketName();
+    const s3ResizedVideosBucket = ConfigProvider.getS3ResizedVideosBucket();
 
     const awsRegion = ConfigProvider.getAwsRegion();
 
-    const modules: DependencyInjectionModule[] = [
-      new VideoModule({
-        s3ResizedVideosBucketName,
-      }),
-    ];
+    const modules: DependencyInjectionModule[] = [new VideoModule({ s3ResizedVideosBucket })];
 
     const container = DependencyInjectionContainerFactory.create({ modules });
 

@@ -1,21 +1,19 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
-import { createWriteStream } from 'node:fs';
-import { Readable } from 'node:stream';
 
-import { type DownloadObjectPayload, type S3Service, type UploadObjectPayload } from './s3Service.js';
+import { type GetObjectPayload, type S3Service, type PutObjectPayload } from './s3Service.js';
 import { type S3Client } from '../../clients/s3Client/s3Client.js';
 import { S3ServiceError } from '../../errors/s3ServiceError.js';
 
 export class S3ServiceImpl implements S3Service {
   public constructor(private readonly s3Client: S3Client) {}
 
-  public async uploadObject(payload: UploadObjectPayload): Promise<void> {
-    const { bucketName, objectKey, data } = payload;
+  public async putObject(payload: PutObjectPayload): Promise<void> {
+    const { bucket, objectKey, data } = payload;
 
     const command = new PutObjectCommand({
-      Bucket: bucketName,
+      Bucket: bucket,
       Key: objectKey,
       Body: data,
     });
@@ -24,33 +22,27 @@ export class S3ServiceImpl implements S3Service {
       await this.s3Client.send(command);
     } catch (error) {
       throw new S3ServiceError({
-        bucket: bucketName,
+        bucket,
         objectKey,
       });
     }
   }
 
-  public async downloadObject(payload: DownloadObjectPayload): Promise<void> {
-    const { bucketName, objectKey, destinationPath } = payload;
+  public async getObject(payload: GetObjectPayload): Promise<ReadableStream | undefined> {
+    const { bucket, objectKey } = payload;
 
     const command = new GetObjectCommand({
-      Bucket: bucketName,
+      Bucket: bucket,
       Key: objectKey,
     });
 
     try {
       const result = await this.s3Client.send(command);
 
-      const body = result.Body;
-
-      if (body instanceof Readable) {
-        const writeStream = createWriteStream(destinationPath);
-
-        body.pipe(writeStream);
-      }
+      return result.Body ? result.Body.transformToWebStream() : undefined;
     } catch (error) {
       throw new S3ServiceError({
-        bucket: bucketName,
+        bucket,
         objectKey,
       });
     }
