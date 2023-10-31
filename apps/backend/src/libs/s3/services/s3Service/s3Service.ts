@@ -13,5 +13,5 @@ export interface GetObjectPayload {
 
 export interface S3Service {
   putObject(payload: PutObjectPayload): Promise<void>;
-  getObject(payload: GetObjectPayload): Promise<ReadableStream | undefined>;
+  getObject(payload: GetObjectPayload): Promise<Readable | undefined>;
 }

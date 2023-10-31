@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
 import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { type Readable } from 'node:stream';
 
 import { type GetObjectPayload, type S3Service, type PutObjectPayload } from './s3Service.js';
 import { type S3Client } from '../../clients/s3Client/s3Client.js';
@@ -28,7 +29,7 @@ export class S3ServiceImpl implements S3Service {
     }
   }
 
-  public async getObject(payload: GetObjectPayload): Promise<ReadableStream | undefined> {
+  public async getObject(payload: GetObjectPayload): Promise<Readable | undefined> {
     const { bucket, objectKey } = payload;
 
     const command = new GetObjectCommand({
@@ -39,7 +40,7 @@ export class S3ServiceImpl implements S3Service {
     try {
       const result = await this.s3Client.send(command);
 
-      return result.Body ? result.Body.transformToWebStream() : undefined;
+      return result.Body as Readable | undefined;
     } catch (error) {
       throw new S3ServiceError({
         bucket,

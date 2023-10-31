@@ -98,7 +98,7 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
 
     const writeStream = createWriteStream(destinationPath);
 
-    videoData.pipeTo(writeStream);
+    videoData.pipe(writeStream);
 
     this.loggerService.info({
       message: 'Video downloaded.',
