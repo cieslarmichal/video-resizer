@@ -1,5 +1,6 @@
 import { beforeEach, expect, describe, it } from 'vitest';
 
+import { Application } from '../../../../../core/application.js';
 import { type DependencyInjectionContainer } from '../../../../../libs/dependencyInjection/dependencyInjectionContainer.js';
 
 describe('UploadResizedVideoCommandHandlerImpl', () => {
