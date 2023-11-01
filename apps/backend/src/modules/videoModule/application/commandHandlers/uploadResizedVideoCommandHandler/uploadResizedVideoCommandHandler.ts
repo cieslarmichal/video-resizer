@@ -4,7 +4,7 @@ import { type VideoResolution } from '../../../../../common/types/videoResolutio
 export interface ExecutePayload {
   readonly s3VideosBucket: string;
   readonly s3VideoKey: string;
-  readonly targetResolution: VideoResolution;
+  readonly resolution: VideoResolution;
 }
 
 export type UploadResizedVideoCommandHandler = CommandHandler<ExecutePayload, void>;

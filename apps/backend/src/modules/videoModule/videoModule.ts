@@ -3,6 +3,10 @@ import { Video480pQueueController } from './api/queueHandlers/video480pQueueCont
 import { Video720pQueueController } from './api/queueHandlers/video720pQueueHandler/video720pQueueController.js';
 import { type UploadResizedVideoCommandHandler } from './application/commandHandlers/uploadResizedVideoCommandHandler/uploadResizedVideoCommandHandler.js';
 import { UploadResizedVideoCommandHandlerImpl } from './application/commandHandlers/uploadResizedVideoCommandHandler/uploadResizedVideoCommandHandlerImpl.js';
+import { type FileTransferService } from './application/services/fileTransferService/fileTransferService.js';
+import { FileTransferServiceImpl } from './application/services/fileTransferService/fileTransferServiceImpl.js';
+import { type VideoResizerService } from './application/services/videoResizerService/videoResizerService.js';
+import { VideoResizerServiceImpl } from './application/services/videoResizerService/videoResizerServiceImpl.js';
 import { symbols } from './symbols.js';
 import { type VideoModuleConfig } from './videoModuleConfig.js';
 import { coreSymbols } from '../../core/symbols.js';
@@ -17,11 +21,19 @@ export class VideoModule implements DependencyInjectionModule {
   public declareBindings(container: DependencyInjectionContainer): void {
     container.bindToValue<VideoModuleConfig>(symbols.videoModuleConfig, this.config);
 
+    container.bind<FileTransferService>(
+      symbols.fileTransferService,
+      () => new FileTransferServiceImpl(container.get<S3Service>(coreSymbols.s3Service)),
+    );
+
+    container.bind<VideoResizerService>(symbols.videoResizerService, () => new VideoResizerServiceImpl());
+
     container.bind<UploadResizedVideoCommandHandler>(
       symbols.uploadResizedVideoCommandHandler,
       () =>
         new UploadResizedVideoCommandHandlerImpl(
-          container.get<S3Service>(coreSymbols.s3Service),
+          container.get<FileTransferService>(symbols.fileTransferService),
+          container.get<VideoResizerService>(symbols.videoResizerService),
           container.get<VideoModuleConfig>(symbols.videoModuleConfig),
           container.get<LoggerService>(coreSymbols.loggerService),
         ),

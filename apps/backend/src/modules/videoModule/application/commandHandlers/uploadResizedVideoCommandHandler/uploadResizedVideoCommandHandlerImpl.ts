@@ -1,37 +1,21 @@
-/* eslint-disable import/no-named-as-default-member */
-
-import ffmpegPath from 'ffmpeg-static';
-import ffmpeg from 'fluent-ffmpeg';
-import { createWriteStream } from 'node:fs';
 import path from 'node:path';
 
 import { type UploadResizedVideoCommandHandler, type ExecutePayload } from './uploadResizedVideoCommandHandler.js';
-import { VideoResolution } from '../../../../../common/types/videoResolution.js';
 import { type LoggerService } from '../../../../../libs/logger/services/loggerService/loggerService.js';
 import { type VideoModuleConfig } from '../../../videoModuleConfig.js';
 import { type FileTransferService } from '../../services/fileTransferService/fileTransferService.js';
-
-interface ResizeVideoPayload {
-  readonly sourcePath: string;
-  readonly destinationPath: string;
-  readonly targetResolution: VideoResolution;
-}
+import { type VideoResizerService } from '../../services/videoResizerService/videoResizerService.js';
 
 export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoCommandHandler {
-  private readonly videoResolutionToResolutionWidthMapping = new Map<VideoResolution, number>([
-    [VideoResolution.standardDefinition360, 360],
-    [VideoResolution.standardDefinition480, 480],
-    [VideoResolution.highDefinition, 720],
-  ]);
-
   public constructor(
     private readonly fileTransferService: FileTransferService,
+    private readonly videoResizerService: VideoResizerService,
     private readonly config: VideoModuleConfig,
     private readonly loggerService: LoggerService,
   ) {}
 
   public async execute(payload: ExecutePayload): Promise<void> {
-    const { s3VideosBucket, s3VideoKey, targetResolution } = payload;
+    const { s3VideosBucket, s3VideoKey, resolution } = payload;
 
     const videoPath = `/tmp/${s3VideoKey}`;
 
@@ -52,14 +36,14 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
 
     const parsedVideoPath = path.parse(s3VideoKey);
 
-    const s3ResizedVideoKey = `${parsedVideoPath.name}-${targetResolution}${parsedVideoPath.ext}`;
+    const s3ResizedVideoKey = `${parsedVideoPath.name}-${resolution}${parsedVideoPath.ext}`;
 
     const resizedVideoPath = `/tmp/${s3ResizedVideoKey}`;
 
-    await this.resizeVideo({
+    await this.videoResizerService.resizeVideo({
       sourcePath: videoPath,
       destinationPath: resizedVideoPath,
-      targetResolution,
+      resolution,
     });
 
     this.loggerService.info({
@@ -67,7 +51,7 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
       context: {
         videoPath,
         resizedVideoPath,
-        targetResolution,
+        resolution,
       },
     });
 
@@ -87,18 +71,5 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
         resizedVideoPath,
       },
     });
-  }
-
-  private async resizeVideo(payload: ResizeVideoPayload): Promise<void> {
-    const { sourcePath, destinationPath, targetResolution } = payload;
-
-    ffmpeg.setFfmpegPath(ffmpegPath as unknown as string);
-
-    const resolutionWidth = this.videoResolutionToResolutionWidthMapping.get(targetResolution) as number;
-
-    ffmpeg()
-      .input(sourcePath)
-      .outputOptions('-vf', `scale=-2:${resolutionWidth}`)
-      .pipe(createWriteStream(destinationPath));
   }
 }
