@@ -60,7 +60,7 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
     await this.fileTransferService.uploadFileToS3({
       s3Bucket: s3ResizedVideosBucket,
       s3ObjectKey: s3VideoKey,
-      sourcePath: resizedVideoPath,
+      filePath: resizedVideoPath,
     });
 
     this.loggerService.info({

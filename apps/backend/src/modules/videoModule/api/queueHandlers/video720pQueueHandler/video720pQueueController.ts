@@ -62,7 +62,7 @@ export class Video720pQueueController {
         await this.uploadResizedVideoCommandHandler.execute({
           s3VideosBucket: bucket,
           s3VideoKey: objectKey,
-          targetResolution: VideoResolution.highDefinition,
+          resolution: VideoResolution.highDefinition,
         });
 
         this.loggerService.debug({
