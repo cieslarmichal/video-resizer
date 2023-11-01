@@ -17,3 +17,4 @@ services:
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
       - ./localstack/localstack-setup.sh:/etc/localstack/init/ready.d/localstack-setup.sh
+      - ./resources:/usr/share/app/resources
