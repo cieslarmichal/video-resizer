@@ -1,9 +1,14 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 
-import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import { GetObjectCommand, HeadObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { type Readable } from 'node:stream';
 
-import { type GetObjectPayload, type S3Service, type PutObjectPayload } from './s3Service.js';
+import {
+  type GetObjectPayload,
+  type S3Service,
+  type PutObjectPayload,
+  type CheckIfObjectExistsPayload,
+} from './s3Service.js';
 import { type S3Client } from '../../clients/s3Client/s3Client.js';
 import { S3ServiceError } from '../../errors/s3ServiceError.js';
 
@@ -46,6 +51,23 @@ export class S3ServiceImpl implements S3Service {
         bucket,
         objectKey,
       });
+    }
+  }
+
+  public async checkIfObjectExists(payload: CheckIfObjectExistsPayload): Promise<boolean> {
+    const { bucket, objectKey } = payload;
+
+    const command = new HeadObjectCommand({
+      Bucket: bucket,
+      Key: objectKey,
+    });
+
+    try {
+      await this.s3Client.send(command);
+
+      return true;
+    } catch (error) {
+      return false;
     }
   }
 }

@@ -19,3 +19,5 @@ coverage
 .tsbuildinfo
 
 .turbo
+
+**/testData/**

@@ -1,14 +1,18 @@
 import { createReadStream, createWriteStream, existsSync } from 'node:fs';
 
-import { type DownloadFilePayload, type UploadFilePayload, type FileTransferService } from './fileTransferService.js';
+import {
+  type DownloadFileFromS3Payload,
+  type UploadFileToS3Payload,
+  type FileTransferService,
+} from './fileTransferService.js';
 import { ResourceNotFoundError } from '../../../../../common/errors/common/resourceNotFoundError.js';
 import { type S3Service } from '../../../../../libs/s3/services/s3Service/s3Service.js';
 
 export class FileTransferServiceImpl implements FileTransferService {
   public constructor(private readonly s3Service: S3Service) {}
 
-  public async downloadFile(payload: DownloadFilePayload): Promise<void> {
-    const { s3Bucket, s3ObjectKey, destinationPath } = payload;
+  public async downloadFileFromS3(payload: DownloadFileFromS3Payload): Promise<void> {
+    const { s3Bucket, s3ObjectKey, destinationFilePath } = payload;
 
     const videoData = await this.s3Service.getObject({
       bucket: s3Bucket,
@@ -23,25 +27,23 @@ export class FileTransferServiceImpl implements FileTransferService {
       });
     }
 
-    const writeStream = createWriteStream(destinationPath);
-
-    videoData.pipe(writeStream);
+    videoData.pipe(createWriteStream(destinationFilePath));
   }
 
-  public async uploadFile(payload: UploadFilePayload): Promise<void> {
-    const { s3Bucket, s3ObjectKey, sourcePath } = payload;
+  public async uploadFileToS3(payload: UploadFileToS3Payload): Promise<void> {
+    const { s3Bucket, s3ObjectKey, filePath } = payload;
 
-    if (!existsSync(sourcePath)) {
+    if (!existsSync(filePath)) {
       throw new ResourceNotFoundError({
         name: 'File',
-        path: sourcePath,
+        filePath,
       });
     }
 
     await this.s3Service.putObject({
       bucket: s3Bucket,
       objectKey: s3ObjectKey,
-      data: createReadStream(sourcePath),
+      data: createReadStream(filePath),
     });
   }
 }

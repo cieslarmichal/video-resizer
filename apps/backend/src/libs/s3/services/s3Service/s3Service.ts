@@ -11,7 +11,13 @@ export interface GetObjectPayload {
   readonly objectKey: string;
 }
 
+export interface CheckIfObjectExistsPayload {
+  readonly bucket: string;
+  readonly objectKey: string;
+}
+
 export interface S3Service {
   putObject(payload: PutObjectPayload): Promise<void>;
   getObject(payload: GetObjectPayload): Promise<Readable | undefined>;
+  checkIfObjectExists(payload: CheckIfObjectExistsPayload): Promise<boolean>;
 }

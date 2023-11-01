@@ -19,10 +19,10 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
 
     const videoPath = `/tmp/${s3VideoKey}`;
 
-    await this.fileTransferService.downloadFile({
+    await this.fileTransferService.downloadFileFromS3({
       s3Bucket: s3VideosBucket,
       s3ObjectKey: s3VideoKey,
-      destinationPath: videoPath,
+      destinationFilePath: videoPath,
     });
 
     this.loggerService.info({
@@ -57,7 +57,7 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
 
     const { s3ResizedVideosBucket } = this.config;
 
-    await this.fileTransferService.uploadFile({
+    await this.fileTransferService.uploadFileToS3({
       s3Bucket: s3ResizedVideosBucket,
       s3ObjectKey: s3VideoKey,
       sourcePath: resizedVideoPath,

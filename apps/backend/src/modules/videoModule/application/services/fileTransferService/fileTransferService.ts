@@ -1,16 +1,16 @@
-export interface DownloadFilePayload {
+export interface DownloadFileFromS3Payload {
   readonly s3Bucket: string;
   readonly s3ObjectKey: string;
-  readonly destinationPath: string;
+  readonly destinationFilePath: string;
 }
 
-export interface UploadFilePayload {
+export interface UploadFileToS3Payload {
   readonly s3Bucket: string;
   readonly s3ObjectKey: string;
-  readonly sourcePath: string;
+  readonly filePath: string;
 }
 
 export interface FileTransferService {
-  downloadFile(payload: DownloadFilePayload): Promise<void>;
-  uploadFile(payload: UploadFilePayload): Promise<void>;
+  downloadFileFromS3(payload: DownloadFileFromS3Payload): Promise<void>;
+  uploadFileToS3(payload: UploadFileToS3Payload): Promise<void>;
 }
