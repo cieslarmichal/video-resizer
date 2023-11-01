@@ -58,7 +58,7 @@ export class VideoModule implements DependencyInjectionModule {
     );
 
     container.bind<Video720pQueueController>(
-      symbols.video480pQueueController,
+      symbols.video720pQueueController,
       () =>
         new Video720pQueueController(
           container.get<UploadResizedVideoCommandHandler>(symbols.uploadResizedVideoCommandHandler),

@@ -15,7 +15,7 @@ export class Application {
 
     const s3ResizedVideosBucket = ConfigProvider.getS3ResizedVideosBucket();
 
-    const s3Endpoint = ConfigProvider.getS3Endpoint();
+    const awsEndpoint = ConfigProvider.getAwsEndpoint();
 
     const awsRegion = ConfigProvider.getAwsRegion();
 
@@ -28,7 +28,7 @@ export class Application {
     container.bind<S3Service>(symbols.s3Service, () =>
       S3ServiceFactory.create({
         region: awsRegion,
-        endpoint: s3Endpoint,
+        endpoint: awsEndpoint,
       }),
     );
 

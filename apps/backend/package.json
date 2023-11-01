@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start:dev": "node --env-file=.env --inspect --loader ts-node/esm src/index.ts",
     "build:clean": "rimraf dist",
     "build": "tsc --build tsconfig.build.json",
     "build:dev": "tsc --build tsconfig.json",

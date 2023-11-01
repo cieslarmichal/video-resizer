@@ -19,7 +19,7 @@ describe('FileTransferServiceImpl', () => {
 
   let s3Service: S3Service;
 
-  const resourcesDirectory = join(__dirname, '..', '..', '..', '..', '..', 'resources');
+  const resourcesDirectory = join(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', 'resources');
 
   const testDataDirectory = join(__dirname, 'testData');
 
@@ -85,15 +85,15 @@ describe('FileTransferServiceImpl', () => {
     });
 
     it('downloads a file from s3 to filesystem', async () => {
+      const destinationFilePath = path.join(testDataDirectory, sampleFileName1);
+
       await fileTransferService.downloadFileFromS3({
         s3Bucket: existingS3Bucket,
         s3ObjectKey: sampleFileName1,
-        destinationFilePath: testDataDirectory,
+        destinationFilePath,
       });
 
-      const expectedFilePath = path.join(testDataDirectory, sampleFileName1);
-
-      expect(existsSync(expectedFilePath));
+      expect(existsSync(destinationFilePath));
     });
   });
 

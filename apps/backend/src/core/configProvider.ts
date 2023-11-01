@@ -31,8 +31,8 @@ export class ConfigProvider {
     return this.getStringEnvVariable('S3_RESIZED_VIDEOS_BUCKET');
   }
 
-  public static getS3Endpoint(): string | undefined {
-    return EnvParser.parseString({ name: 'S3_ENDPOINT' });
+  public static getAwsEndpoint(): string | undefined {
+    return EnvParser.parseString({ name: 'AWS_ENDPOINT' });
   }
 
   public static getAwsRegion(): AwsRegion {
