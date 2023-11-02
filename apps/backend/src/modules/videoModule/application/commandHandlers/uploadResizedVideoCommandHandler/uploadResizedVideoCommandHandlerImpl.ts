@@ -25,6 +25,8 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
       destinationFilePath: videoPath,
     });
 
+    await new Promise((f) => setTimeout(f, 1000));
+
     this.loggerService.info({
       message: 'Video downloaded.',
       context: {
@@ -59,14 +61,14 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
 
     await this.fileTransferService.uploadFileToS3({
       s3Bucket: s3ResizedVideosBucket,
-      s3ObjectKey: s3VideoKey,
+      s3ObjectKey: s3ResizedVideoKey,
       filePath: resizedVideoPath,
     });
 
     this.loggerService.info({
       message: 'Video uploaded.',
       context: {
-        bucket: s3VideosBucket,
+        bucket: s3ResizedVideosBucket,
         objectKey: s3ResizedVideoKey,
         resizedVideoPath,
       },

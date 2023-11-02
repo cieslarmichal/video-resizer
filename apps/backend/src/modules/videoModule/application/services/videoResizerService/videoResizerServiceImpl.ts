@@ -17,12 +17,12 @@ export class VideoResizerServiceImpl implements VideoResizerService {
   ]);
 
   public async resizeVideo(payload: ResizeVideoPayload): Promise<void> {
-    const { sourceFilePath: sourcePath, destinationFilePath: destinationPath, resolution } = payload;
+    const { sourceFilePath, destinationFilePath, resolution } = payload;
 
-    if (!existsSync(sourcePath)) {
+    if (!existsSync(sourceFilePath)) {
       throw new ResourceNotFoundError({
         name: 'File',
-        path: sourcePath,
+        path: sourceFilePath,
       });
     }
 
@@ -38,8 +38,8 @@ export class VideoResizerServiceImpl implements VideoResizerService {
     }
 
     await new Promise((resolve, reject) => {
-      ffmpeg(sourcePath)
-        .output(destinationPath)
+      ffmpeg(sourceFilePath)
+        .output(destinationFilePath)
         .videoCodec('libx264')
         .outputOptions('-vf', `scale=-2:${resolutionHeight}`)
         .on('end', () => resolve('done'))

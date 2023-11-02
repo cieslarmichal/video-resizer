@@ -41,10 +41,34 @@ describe('FileTransferServiceImpl', () => {
     fileTransferService = container.get<FileTransferService>(symbols.fileTransferService);
 
     s3Service = container.get<S3Service>(coreSymbols.s3Service);
+
+    if (
+      await s3Service.checkIfObjectExists({
+        bucket: existingS3Bucket,
+        objectKey: sampleFileName2,
+      })
+    ) {
+      await s3Service.deleteObject({
+        bucket: existingS3Bucket,
+        objectKey: sampleFileName2,
+      });
+    }
   });
 
   afterEach(async () => {
     await rm(testDataDirectory, { recursive: true });
+
+    if (
+      await s3Service.checkIfObjectExists({
+        bucket: existingS3Bucket,
+        objectKey: sampleFileName2,
+      })
+    ) {
+      await s3Service.deleteObject({
+        bucket: existingS3Bucket,
+        objectKey: sampleFileName2,
+      });
+    }
   });
 
   describe('download', () => {
@@ -145,11 +169,12 @@ describe('FileTransferServiceImpl', () => {
         filePath,
       });
 
-      const objects = await s3Service.listObjects({
+      const fileExistsInS3 = await s3Service.checkIfObjectExists({
         bucket: existingS3Bucket,
+        objectKey: sampleFileName2,
       });
 
-      expect(objects.includes(sampleFileName2)).toBe(true);
+      expect(fileExistsInS3).toBe(true);
     });
   });
 });

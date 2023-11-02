@@ -6,17 +6,29 @@ export interface PutObjectPayload {
   readonly data: Readable;
 }
 
-export interface GetObjectPayload {
+export interface GetObjectDataPayload {
   readonly bucket: string;
   readonly objectKey: string;
 }
 
-export interface ListObjectsPayload {
+export interface DeleteObjectPayload {
   readonly bucket: string;
+  readonly objectKey: string;
+}
+
+export interface GetObjectsKeysPayload {
+  readonly bucket: string;
+}
+
+export interface CheckIfObjectExistsPayload {
+  readonly bucket: string;
+  readonly objectKey: string;
 }
 
 export interface S3Service {
   putObject(payload: PutObjectPayload): Promise<void>;
-  getObject(payload: GetObjectPayload): Promise<Readable | undefined>;
-  listObjects(payload: ListObjectsPayload): Promise<string[]>;
+  deleteObject(payload: GetObjectDataPayload): Promise<void>;
+  getObjectData(payload: GetObjectDataPayload): Promise<Readable | undefined>;
+  getObjectsKeys(payload: GetObjectsKeysPayload): Promise<string[]>;
+  checkIfObjectExists(payload: CheckIfObjectExistsPayload): Promise<boolean>;
 }

@@ -1,8 +1,8 @@
 .idea
 node_modules
 
-**/.env
-**/.env.test
+**/*/.env
+**/*/.env.test
 
 dist
 *.log

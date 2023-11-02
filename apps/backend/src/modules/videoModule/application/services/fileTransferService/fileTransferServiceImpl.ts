@@ -14,7 +14,7 @@ export class FileTransferServiceImpl implements FileTransferService {
   public async downloadFileFromS3(payload: DownloadFileFromS3Payload): Promise<void> {
     const { s3Bucket, s3ObjectKey, destinationFilePath } = payload;
 
-    const videoData = await this.s3Service.getObject({
+    const videoData = await this.s3Service.getObjectData({
       bucket: s3Bucket,
       objectKey: s3ObjectKey,
     });
