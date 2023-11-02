@@ -2,7 +2,7 @@ import { BaseError } from '../../../common/errors/base/baseError.js';
 
 interface Context {
   readonly bucket: string;
-  readonly objectKey: string;
+  readonly objectKey?: string;
   readonly [key: string]: unknown;
 }
 

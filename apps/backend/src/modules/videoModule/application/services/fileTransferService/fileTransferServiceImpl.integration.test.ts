@@ -145,12 +145,11 @@ describe('FileTransferServiceImpl', () => {
         filePath,
       });
 
-      const fileExists = await s3Service.checkIfObjectExists({
+      const objects = await s3Service.listObjects({
         bucket: existingS3Bucket,
-        objectKey: sampleFileName2,
       });
 
-      expect(fileExists).toBe(true);
+      expect(objects.includes(sampleFileName2)).toBe(true);
     });
   });
 });
