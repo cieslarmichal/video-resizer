@@ -20,4 +20,4 @@ coverage
 
 .turbo
 
-**/testData/**
+**/*/testData/**

@@ -3,13 +3,13 @@ import { mkdir, rm } from 'node:fs/promises';
 import path, { join } from 'path';
 import { beforeEach, expect, describe, it, afterEach } from 'vitest';
 
-import { type FileTransferService } from './fileTransferService.js';
 import { ResourceNotFoundError } from '../../../../../common/errors/common/resourceNotFoundError.js';
 import { Generator } from '../../../../../common/tests/generator.js';
 import { Application } from '../../../../../core/application.js';
 import { coreSymbols } from '../../../../../core/symbols.js';
 import { type DependencyInjectionContainer } from '../../../../../libs/dependencyInjection/dependencyInjectionContainer.js';
 import { type S3Service } from '../../../../../libs/s3/services/s3Service/s3Service.js';
+import { type FileTransferService } from '../../../application/services/fileTransferService/fileTransferService.js';
 import { symbols } from '../../../symbols.js';
 
 describe('FileTransferServiceImpl', () => {

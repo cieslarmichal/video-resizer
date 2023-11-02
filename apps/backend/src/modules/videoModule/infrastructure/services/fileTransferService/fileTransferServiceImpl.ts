@@ -1,12 +1,12 @@
 import { createReadStream, createWriteStream, existsSync } from 'node:fs';
 
-import {
-  type DownloadFileFromS3Payload,
-  type UploadFileToS3Payload,
-  type FileTransferService,
-} from './fileTransferService.js';
 import { ResourceNotFoundError } from '../../../../../common/errors/common/resourceNotFoundError.js';
 import { type S3Service } from '../../../../../libs/s3/services/s3Service/s3Service.js';
+import {
+  type FileTransferService,
+  type DownloadFileFromS3Payload,
+  type UploadFileToS3Payload,
+} from '../../../application/services/fileTransferService/fileTransferService.js';
 
 export class FileTransferServiceImpl implements FileTransferService {
   public constructor(private readonly s3Service: S3Service) {}

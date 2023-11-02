@@ -26,8 +26,6 @@ export class VideoResizerServiceImpl implements VideoResizerService {
       });
     }
 
-    ffmpeg.setFfmpegPath(ffmpegPath as unknown as string);
-
     const resolutionHeight = this.videoResolutionToResolutionHeightMapping.get(resolution);
 
     if (!resolutionHeight) {
@@ -36,6 +34,8 @@ export class VideoResizerServiceImpl implements VideoResizerService {
         resolution,
       });
     }
+
+    ffmpeg.setFfmpegPath(ffmpegPath as unknown as string);
 
     await new Promise((resolve, reject) => {
       ffmpeg(sourceFilePath)

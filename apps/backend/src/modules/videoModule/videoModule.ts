@@ -4,9 +4,9 @@ import { Video720pQueueController } from './api/queueHandlers/video720pQueueHand
 import { type UploadResizedVideoCommandHandler } from './application/commandHandlers/uploadResizedVideoCommandHandler/uploadResizedVideoCommandHandler.js';
 import { UploadResizedVideoCommandHandlerImpl } from './application/commandHandlers/uploadResizedVideoCommandHandler/uploadResizedVideoCommandHandlerImpl.js';
 import { type FileTransferService } from './application/services/fileTransferService/fileTransferService.js';
-import { FileTransferServiceImpl } from './application/services/fileTransferService/fileTransferServiceImpl.js';
 import { type VideoResizerService } from './application/services/videoResizerService/videoResizerService.js';
 import { VideoResizerServiceImpl } from './application/services/videoResizerService/videoResizerServiceImpl.js';
+import { FileTransferServiceImpl } from './infrastructure/services/fileTransferService/fileTransferServiceImpl.js';
 import { symbols } from './symbols.js';
 import { type VideoModuleConfig } from './videoModuleConfig.js';
 import { coreSymbols } from '../../core/symbols.js';

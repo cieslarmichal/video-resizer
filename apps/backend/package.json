@@ -7,7 +7,7 @@
     "build": "tsc --build tsconfig.build.json",
     "build:dev": "tsc --build tsconfig.json",
     "test:unit": "dotenv -e .env.test -- vitest .unit.test.ts --threads false",
-    "test:integration": "dotenv -e .env.test -- vitest uploadResizedVideoCommandHandlerImpl.integration.test.ts --threads false",
+    "test:integration": "dotenv -e .env.test -- vitest .integration.test.ts --threads false",
     "lint": "eslint . --ext .ts --cache --max-warnings 0",
     "lint:fix": "npm run lint -- --fix"
   },
