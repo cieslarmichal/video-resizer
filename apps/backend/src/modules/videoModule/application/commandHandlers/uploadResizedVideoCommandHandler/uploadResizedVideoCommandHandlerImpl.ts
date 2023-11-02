@@ -41,8 +41,8 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
     const resizedVideoPath = `/tmp/${s3ResizedVideoKey}`;
 
     await this.videoResizerService.resizeVideo({
-      sourcePath: videoPath,
-      destinationPath: resizedVideoPath,
+      sourceFilePath: videoPath,
+      destinationFilePath: resizedVideoPath,
       resolution,
     });
 

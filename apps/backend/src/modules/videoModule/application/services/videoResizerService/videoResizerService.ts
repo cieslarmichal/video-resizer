@@ -1,8 +1,8 @@
 import { type VideoResolution } from '../../../../../common/types/videoResolution.js';
 
 export interface ResizeVideoPayload {
-  readonly sourcePath: string;
-  readonly destinationPath: string;
+  readonly sourceFilePath: string;
+  readonly destinationFilePath: string;
   readonly resolution: VideoResolution;
 }
 
