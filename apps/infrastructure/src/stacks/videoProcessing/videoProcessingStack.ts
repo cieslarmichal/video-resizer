@@ -73,7 +73,7 @@ export class VideoProcessingStack extends core.Stack {
 
     s3VideosBucket.grantRead(resizeVideoTo360pLambda);
 
-    s3ResizedVideosBucket.grantRead(resizeVideoTo360pLambda);
+    s3ResizedVideosBucket.grantReadWrite(resizeVideoTo360pLambda);
 
     resizeVideoTo360pLambda.addEventSource(
       new lambdaSources.SqsEventSource(resizeVideoTo360pQueue, {
@@ -89,7 +89,7 @@ export class VideoProcessingStack extends core.Stack {
 
     s3VideosBucket.grantRead(resizeVideoTo480pLambda);
 
-    s3ResizedVideosBucket.grantRead(resizeVideoTo480pLambda);
+    s3ResizedVideosBucket.grantReadWrite(resizeVideoTo480pLambda);
 
     resizeVideoTo480pLambda.addEventSource(
       new lambdaSources.SqsEventSource(resizeVideoTo480pQueue, {
@@ -105,7 +105,7 @@ export class VideoProcessingStack extends core.Stack {
 
     s3VideosBucket.grantRead(resizeVideoTo720pLambda);
 
-    s3ResizedVideosBucket.grantRead(resizeVideoTo720pLambda);
+    s3ResizedVideosBucket.grantReadWrite(resizeVideoTo720pLambda);
 
     resizeVideoTo720pLambda.addEventSource(
       new lambdaSources.SqsEventSource(resizeVideoTo720pQueue, {
