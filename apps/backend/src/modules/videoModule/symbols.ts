@@ -3,6 +3,7 @@ export const symbols = {
   uploadResizedVideoCommandHandler: Symbol('uploadResizedVideoCommandHandler'),
   fileTransferService: Symbol('fileTransferService'),
   videoResizerService: Symbol('videoResizerService'),
+  processExecutorService: Symbol('processExecutorService'),
   video360pQueueController: Symbol('video360pQueueController'),
   video480pQueueController: Symbol('video480pQueueController'),
   video720pQueueController: Symbol('video720pQueueController'),

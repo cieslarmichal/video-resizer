@@ -1,19 +1,21 @@
 /* eslint-disable import/no-named-as-default-member */
 
 import ffmpegPath from 'ffmpeg-static';
-import ffmpeg from 'fluent-ffmpeg';
 import { existsSync } from 'node:fs';
 
 import { type ResizeVideoPayload, type VideoResizerService } from './videoResizerService.js';
 import { OperationNotValidError } from '../../../../../common/errors/common/operationNotValidError.js';
 import { ResourceNotFoundError } from '../../../../../common/errors/common/resourceNotFoundError.js';
 import { VideoResolution } from '../../../../../common/types/videoResolution.js';
+import { type ProcessExecutorService } from '../processExecutorService/processExecutorService.js';
 
 export class VideoResizerServiceImpl implements VideoResizerService {
-  private readonly videoResolutionToResolutionHeightMapping = new Map<VideoResolution, number>([
-    [VideoResolution.standardDefinition360, 360],
-    [VideoResolution.standardDefinition480, 480],
-    [VideoResolution.highDefinition, 720],
+  public constructor(private readonly processExecutorService: ProcessExecutorService) {}
+
+  private readonly videoResolutionToPixelDimensionsMapping = new Map<VideoResolution, string>([
+    [VideoResolution.standardDefinition360, '640x360'],
+    [VideoResolution.standardDefinition480, '854x480'],
+    [VideoResolution.highDefinition, '1280x720'],
   ]);
 
   public async resizeVideo(payload: ResizeVideoPayload): Promise<void> {
@@ -26,25 +28,26 @@ export class VideoResizerServiceImpl implements VideoResizerService {
       });
     }
 
-    const resolutionHeight = this.videoResolutionToResolutionHeightMapping.get(resolution);
+    const videPixelDimensions = this.videoResolutionToPixelDimensionsMapping.get(resolution);
 
-    if (!resolutionHeight) {
+    if (!videPixelDimensions) {
       throw new OperationNotValidError({
         reason: 'Target resolution not supported.',
         resolution,
       });
     }
 
-    ffmpeg.setFfmpegPath(ffmpegPath as unknown as string);
-
-    await new Promise((resolve, reject) => {
-      ffmpeg(sourceFilePath)
-        .output(destinationFilePath)
-        .videoCodec('libx264')
-        .outputOptions('-vf', `scale=-2:${resolutionHeight}`)
-        .on('end', () => resolve('done'))
-        .on('error', (err) => reject(err))
-        .run();
-    });
+    await this.processExecutorService.execute(ffmpegPath.default as string, [
+      '-loglevel',
+      'error',
+      '-y',
+      '-i',
+      sourceFilePath,
+      '-s',
+      videPixelDimensions,
+      '-f',
+      'mp4',
+      destinationFilePath,
+    ]);
   }
 }

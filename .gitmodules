@@ -1,3 +1,0 @@
-[submodule "apps/backend/packages/node-fluent-ffmpeg"]
-	path = apps/backend/packages/node-fluent-ffmpeg
-	url = https://github.com/fluent-ffmpeg/node-fluent-ffmpeg.git

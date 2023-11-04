@@ -1,3 +1,4 @@
+import { LoggerLevel } from '@video-resizer/backend';
 import * as core from 'aws-cdk-lib';
 import * as kms from 'aws-cdk-lib/aws-kms';
 import * as lambdaSources from 'aws-cdk-lib/aws-lambda-event-sources';
@@ -56,6 +57,7 @@ export class VideoProcessingStack extends core.Stack {
 
     const lambdaEnvironment = {
       ['S3_RESIZED_VIDEOS_BUCKET']: s3ResizedVideosBucket.bucketName,
+      ['LOGGER_LEVEL']: LoggerLevel.debug,
     };
 
     const createLambdaEntryPath = (path: string): string => {

@@ -4,6 +4,8 @@ import { Video720pQueueController } from './api/queueHandlers/video720pQueueHand
 import { type UploadResizedVideoCommandHandler } from './application/commandHandlers/uploadResizedVideoCommandHandler/uploadResizedVideoCommandHandler.js';
 import { UploadResizedVideoCommandHandlerImpl } from './application/commandHandlers/uploadResizedVideoCommandHandler/uploadResizedVideoCommandHandlerImpl.js';
 import { type FileTransferService } from './application/services/fileTransferService/fileTransferService.js';
+import { type ProcessExecutorService } from './application/services/processExecutorService/processExecutorService.js';
+import { ProcessExecutorServiceImpl } from './application/services/processExecutorService/processExecutorServiceImpl.js';
 import { type VideoResizerService } from './application/services/videoResizerService/videoResizerService.js';
 import { VideoResizerServiceImpl } from './application/services/videoResizerService/videoResizerServiceImpl.js';
 import { FileTransferServiceImpl } from './infrastructure/services/fileTransferService/fileTransferServiceImpl.js';
@@ -26,7 +28,12 @@ export class VideoModule implements DependencyInjectionModule {
       () => new FileTransferServiceImpl(container.get<S3Service>(coreSymbols.s3Service)),
     );
 
-    container.bind<VideoResizerService>(symbols.videoResizerService, () => new VideoResizerServiceImpl());
+    container.bind<ProcessExecutorService>(symbols.processExecutorService, () => new ProcessExecutorServiceImpl());
+
+    container.bind<VideoResizerService>(
+      symbols.videoResizerService,
+      () => new VideoResizerServiceImpl(container.get<ProcessExecutorService>(symbols.processExecutorService)),
+    );
 
     container.bind<UploadResizedVideoCommandHandler>(
       symbols.uploadResizedVideoCommandHandler,
