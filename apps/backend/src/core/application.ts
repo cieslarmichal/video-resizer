@@ -19,7 +19,14 @@ export class Application {
 
     const awsRegion = ConfigProvider.getAwsRegion();
 
-    const modules: DependencyInjectionModule[] = [new VideoModule({ s3ResizedVideosBucket })];
+    const ffmpegPath = ConfigProvider.getFfmpegPath();
+
+    const modules: DependencyInjectionModule[] = [
+      new VideoModule({
+        s3ResizedVideosBucket,
+        ffmpegPath,
+      }),
+    ];
 
     const container = DependencyInjectionContainerFactory.create({ modules });
 

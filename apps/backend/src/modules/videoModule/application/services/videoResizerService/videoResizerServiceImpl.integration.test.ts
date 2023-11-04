@@ -1,6 +1,5 @@
 /* eslint-disable import/no-named-as-default-member */
 
-import ffprobe from 'ffprobe-static';
 import ffmpeg from 'fluent-ffmpeg';
 import { existsSync } from 'fs';
 import { mkdir, rm } from 'node:fs/promises';
@@ -11,6 +10,7 @@ import { type VideoResizerService } from './videoResizerService.js';
 import { ResourceNotFoundError } from '../../../../../common/errors/common/resourceNotFoundError.js';
 import { VideoResolution } from '../../../../../common/types/videoResolution.js';
 import { Application } from '../../../../../core/application.js';
+import { ConfigProvider } from '../../../../../core/configProvider.js';
 import { type DependencyInjectionContainer } from '../../../../../libs/dependencyInjection/dependencyInjectionContainer.js';
 import { symbols } from '../../../symbols.js';
 
@@ -26,6 +26,8 @@ describe('VideoResizerServiceImpl', () => {
   const sampleFileName = 'sample_file1.mp4';
 
   const sampleFilePath = path.join(resourcesDirectory, sampleFileName);
+
+  const ffprobePath = ConfigProvider.getFfprobePath();
 
   beforeEach(async () => {
     if (existsSync(testDataDirectory)) {
@@ -74,7 +76,7 @@ describe('VideoResizerServiceImpl', () => {
 
     expect(existsSync(destinationFilePath));
 
-    ffmpeg().setFfprobePath(ffprobe.path);
+    ffmpeg().setFfprobePath(ffprobePath);
 
     const metadata: ffmpeg.FfprobeData = await new Promise((resolve, reject) => {
       ffmpeg.ffprobe(destinationFilePath, function (err, metadata) {
@@ -104,7 +106,7 @@ describe('VideoResizerServiceImpl', () => {
 
     expect(existsSync(destinationFilePath));
 
-    ffmpeg().setFfprobePath(ffprobe.path);
+    ffmpeg().setFfprobePath(ffprobePath);
 
     const metadata: ffmpeg.FfprobeData = await new Promise((resolve, reject) => {
       ffmpeg.ffprobe(destinationFilePath, function (err, metadata) {
@@ -134,7 +136,7 @@ describe('VideoResizerServiceImpl', () => {
 
     expect(existsSync(destinationFilePath));
 
-    ffmpeg().setFfprobePath(ffprobe.path);
+    ffmpeg().setFfprobePath(ffprobePath);
 
     const metadata: ffmpeg.FfprobeData = await new Promise((resolve, reject) => {
       ffmpeg.ffprobe(destinationFilePath, function (err, metadata) {

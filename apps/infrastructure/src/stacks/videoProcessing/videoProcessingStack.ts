@@ -1,5 +1,6 @@
 import { LoggerLevel } from '@video-resizer/backend';
 import * as core from 'aws-cdk-lib';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as lambdaSources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
@@ -55,7 +56,14 @@ export class VideoProcessingStack extends core.Stack {
     const lambdaEnvironment = {
       ['S3_RESIZED_VIDEOS_BUCKET']: s3ResizedVideosBucket.bucketName,
       ['LOGGER_LEVEL']: LoggerLevel.debug,
+      ['FFMPEG_PATH']: '/opt/bin/ffmpeg',
     };
+
+    const ffmegLayer = new lambda.LayerVersion(this, 'ffmpeg-layer', {
+      layerVersionName: 'ffmpeg',
+      compatibleRuntimes: [lambda.Runtime.NODEJS_18_X],
+      code: lambda.AssetCode.fromAsset('ffmpegLambdaLayer/ffmpeg'),
+    });
 
     const createLambdaEntryPath = (path: string): string => {
       return `${process.cwd()}/src/stacks/videoProcessing/lambdas/${path}`;
@@ -64,6 +72,7 @@ export class VideoProcessingStack extends core.Stack {
     const resizeVideoTo360pLambda = new NodejsLambdaFunction(this, 'ResizeVideoTo360pLambda', {
       entry: createLambdaEntryPath('resizeVideoTo360p/resizeVideoTo360pLambdaHandler.ts'),
       environment: lambdaEnvironment,
+      layers: [ffmegLayer],
     });
 
     s3VideosBucket.grantRead(resizeVideoTo360pLambda);
@@ -79,6 +88,7 @@ export class VideoProcessingStack extends core.Stack {
     const resizeVideoTo480pLambda = new NodejsLambdaFunction(this, 'ResizeVideoTo480pLambda', {
       entry: createLambdaEntryPath('resizeVideoTo480p/resizeVideoTo480pLambdaHandler.ts'),
       environment: lambdaEnvironment,
+      layers: [ffmegLayer],
     });
 
     s3VideosBucket.grantRead(resizeVideoTo480pLambda);
@@ -94,6 +104,7 @@ export class VideoProcessingStack extends core.Stack {
     const resizeVideoTo720pLambda = new NodejsLambdaFunction(this, 'ResizeVideoTo720pLambda', {
       entry: createLambdaEntryPath('resizeVideoTo720p/resizeVideoTo720pLambdaHandler.ts'),
       environment: lambdaEnvironment,
+      layers: [ffmegLayer],
     });
 
     s3VideosBucket.grantRead(resizeVideoTo720pLambda);

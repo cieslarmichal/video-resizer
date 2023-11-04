@@ -38,4 +38,12 @@ export class ConfigProvider {
   public static getAwsRegion(): AwsRegion {
     return this.getEnumEnvVariable(AwsRegion, 'AWS_REGION');
   }
+
+  public static getFfmpegPath(): string {
+    return this.getStringEnvVariable('FFMPEG_PATH');
+  }
+
+  public static getFfprobePath(): string {
+    return this.getStringEnvVariable('FFPROBE_PATH');
+  }
 }

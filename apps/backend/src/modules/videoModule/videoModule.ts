@@ -32,7 +32,11 @@ export class VideoModule implements DependencyInjectionModule {
 
     container.bind<VideoResizerService>(
       symbols.videoResizerService,
-      () => new VideoResizerServiceImpl(container.get<ProcessExecutorService>(symbols.processExecutorService)),
+      () =>
+        new VideoResizerServiceImpl(
+          container.get<ProcessExecutorService>(symbols.processExecutorService),
+          container.get<VideoModuleConfig>(symbols.videoModuleConfig),
+        ),
     );
 
     container.bind<UploadResizedVideoCommandHandler>(

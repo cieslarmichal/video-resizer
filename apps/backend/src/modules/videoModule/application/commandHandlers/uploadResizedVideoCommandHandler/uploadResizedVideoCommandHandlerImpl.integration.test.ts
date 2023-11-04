@@ -1,6 +1,5 @@
 /* eslint-disable import/no-named-as-default-member */
 
-import ffprobe from 'ffprobe-static';
 import ffmpeg from 'fluent-ffmpeg';
 import { existsSync } from 'fs';
 import { rm } from 'node:fs/promises';
@@ -9,6 +8,7 @@ import { beforeEach, expect, describe, it, afterEach } from 'vitest';
 import { type UploadResizedVideoCommandHandler } from './uploadResizedVideoCommandHandler.js';
 import { VideoResolution } from '../../../../../common/types/videoResolution.js';
 import { Application } from '../../../../../core/application.js';
+import { ConfigProvider } from '../../../../../core/configProvider.js';
 import { coreSymbols } from '../../../../../core/symbols.js';
 import { type DependencyInjectionContainer } from '../../../../../libs/dependencyInjection/dependencyInjectionContainer.js';
 import { type S3Service } from '../../../../../libs/s3/services/s3Service/s3Service.js';
@@ -32,6 +32,8 @@ describe('UploadResizedVideoCommandHandlerImpl', () => {
   const downloadPath = `/tmp/${s3VideoKey}`;
 
   const uploadPath = `/tmp/${s3ResizedVideoKey}`;
+
+  const ffprobePath = ConfigProvider.getFfprobePath();
 
   beforeEach(async () => {
     if (existsSync(downloadPath)) {
@@ -92,7 +94,7 @@ describe('UploadResizedVideoCommandHandlerImpl', () => {
 
     expect(existsSync(uploadPath));
 
-    ffmpeg().setFfprobePath(ffprobe.path);
+    ffmpeg().setFfprobePath(ffprobePath);
 
     const metadata: ffmpeg.FfprobeData = await new Promise((resolve, reject) => {
       ffmpeg.ffprobe(uploadPath, function (err, metadata) {
