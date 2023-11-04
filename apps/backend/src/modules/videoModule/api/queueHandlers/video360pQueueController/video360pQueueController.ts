@@ -20,7 +20,18 @@ export class Video360pQueueController {
 
         const snsMessage = JSON.parse(sqsRecord.body) as SNSMessage;
 
-        const s3Event = JSON.parse(snsMessage.Message) as S3Event;
+        const snsParsedMessage = JSON.parse(snsMessage.Message);
+
+        const s3Event = snsParsedMessage as S3Event;
+
+        if (!s3Event) {
+          this.loggerService.warn({
+            message: 'S3 event not found.',
+            context: { snsParsedMessage },
+          });
+
+          return;
+        }
 
         const s3EventRecord = s3Event.Records[0];
 
