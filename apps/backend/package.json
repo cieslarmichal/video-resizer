@@ -30,6 +30,8 @@
   "devDependencies": {
     "@faker-js/faker": "^8.2.0",
     "@types/aws-lambda": "^8.10.125",
-    "@types/ffprobe-static": "^2.0.2"
+    "@types/ffprobe-static": "^2.0.2",
+    "@types/fluent-ffmpeg": "^2.1.23",
+    "fluent-ffmpeg": "^2.1.2"
   }
 }

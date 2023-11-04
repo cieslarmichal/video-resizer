@@ -37,7 +37,7 @@ export class VideoResizerServiceImpl implements VideoResizerService {
       });
     }
 
-    await this.processExecutorService.execute(ffmpegPath.default as string, [
+    await this.processExecutorService.execute(ffmpegPath as unknown as string, [
       '-loglevel',
       'error',
       '-y',
