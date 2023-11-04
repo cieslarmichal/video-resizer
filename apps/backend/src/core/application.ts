@@ -13,6 +13,8 @@ export class Application {
   public static createContainer(): DependencyInjectionContainer {
     const loggerLevel = ConfigProvider.getLoggerLevel();
 
+    const loggerPrettyLogs = ConfigProvider.getLoggerPrettyLogs();
+
     const s3ResizedVideosBucket = ConfigProvider.getS3ResizedVideosBucket();
 
     const awsEndpoint = ConfigProvider.getAwsEndpoint();
@@ -30,7 +32,12 @@ export class Application {
 
     const container = DependencyInjectionContainerFactory.create({ modules });
 
-    container.bind<LoggerService>(symbols.loggerService, () => LoggerServiceFactory.create({ loggerLevel }));
+    container.bind<LoggerService>(symbols.loggerService, () =>
+      LoggerServiceFactory.create({
+        loggerLevel,
+        prettyLogs: loggerPrettyLogs,
+      }),
+    );
 
     container.bind<S3Service>(symbols.s3Service, () =>
       S3ServiceFactory.create({

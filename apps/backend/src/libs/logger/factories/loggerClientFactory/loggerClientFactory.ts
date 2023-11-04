@@ -1,22 +1,30 @@
 /* eslint-disable import/no-named-as-default */
 
-import { pino } from 'pino';
+import { type LoggerOptions, pino } from 'pino';
 
 import { type LoggerClient } from '../../clients/loggerClient/loggerClient.js';
 import { type LoggerConfig } from '../../types/loggerConfig.js';
 
 export class LoggerClientFactory {
   public static create(config: LoggerConfig): LoggerClient {
-    const loggerClient = pino({
+    let loggerClientOptions: LoggerOptions = {
       name: 'Logger',
       level: config.loggerLevel,
-      transport: {
-        target: 'pino-pretty',
-        options: {
-          colorize: true,
+    };
+
+    if (config.prettyLogs) {
+      loggerClientOptions = {
+        ...loggerClientOptions,
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            colorize: true,
+          },
         },
-      },
-    });
+      };
+    }
+
+    const loggerClient = pino(loggerClientOptions);
 
     return loggerClient;
   }

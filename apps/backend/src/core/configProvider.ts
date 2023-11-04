@@ -46,4 +46,14 @@ export class ConfigProvider {
   public static getFfprobePath(): string {
     return this.getStringEnvVariable('FFPROBE_PATH');
   }
+
+  public static getLoggerPrettyLogs(): boolean {
+    const value = EnvParser.parseBoolean({ name: 'LOGGER_PRETTY_LOGS' });
+
+    if (value === undefined) {
+      return false;
+    }
+
+    return value;
+  }
 }
