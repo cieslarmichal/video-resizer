@@ -48,8 +48,6 @@ export class VideoResizerServiceImpl implements VideoResizerService {
       sourceFilePath,
       '-s',
       videPixelDimensions,
-      '-f',
-      'mp4',
       destinationFilePath,
     ]);
   }
