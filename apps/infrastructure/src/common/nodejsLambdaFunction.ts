@@ -16,7 +16,7 @@ export class NodejsLambdaFunction extends NodejsFunction {
       },
       architecture: lambda.Architecture.X86_64,
       runtime: lambda.Runtime.NODEJS_18_X,
-      memorySize: 10240,
+      memorySize: 3008,
       ephemeralStorageSize: core.Size.mebibytes(10240),
       tracing: lambda.Tracing.ACTIVE,
       awsSdkConnectionReuse: true,

@@ -34,21 +34,21 @@ export class VideoProcessingStack extends core.Stack {
 
     const resizeVideoTo360pQueue = new sqs.Queue(this, 'ResizeVideoTo360pQueue', {
       queueName: 'ResizeVideoTo360pQueue',
-      visibilityTimeout: core.Duration.seconds(65),
+      visibilityTimeout: core.Duration.minutes(15),
     });
 
     topic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo360pQueue));
 
     const resizeVideoTo480pQueue = new sqs.Queue(this, 'ResizeVideoTo480pQueue', {
       queueName: 'ResizeVideoTo480pQueue',
-      visibilityTimeout: core.Duration.seconds(65),
+      visibilityTimeout: core.Duration.minutes(15),
     });
 
     topic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo480pQueue));
 
     const resizeVideoTo720pQueue = new sqs.Queue(this, 'ResizeVideoTo720pQueue', {
       queueName: 'ResizeVideoTo720pQueue',
-      visibilityTimeout: core.Duration.seconds(65),
+      visibilityTimeout: core.Duration.minutes(15),
     });
 
     topic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo720pQueue));
