@@ -32,6 +32,7 @@ export class S3ServiceImpl implements S3Service {
       throw new S3ServiceError({
         bucket,
         objectKey,
+        error,
       });
     }
   }
@@ -50,6 +51,7 @@ export class S3ServiceImpl implements S3Service {
       throw new S3ServiceError({
         bucket,
         objectKey,
+        error,
       });
     }
   }
@@ -70,6 +72,7 @@ export class S3ServiceImpl implements S3Service {
       throw new S3ServiceError({
         bucket,
         objectKey,
+        error,
       });
     }
   }
@@ -92,6 +95,7 @@ export class S3ServiceImpl implements S3Service {
     } catch (error) {
       throw new S3ServiceError({
         bucket,
+        error,
       });
     }
   }
