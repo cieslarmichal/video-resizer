@@ -16,10 +16,11 @@ export class NodejsLambdaFunction extends NodejsFunction {
       },
       architecture: lambda.Architecture.X86_64,
       runtime: lambda.Runtime.NODEJS_18_X,
-      memorySize: 1024,
+      memorySize: 10240,
+      ephemeralStorageSize: core.Size.mebibytes(10240),
       tracing: lambda.Tracing.ACTIVE,
       awsSdkConnectionReuse: true,
-      timeout: core.Duration.seconds(60),
+      timeout: core.Duration.minutes(15),
       logRetention: logs.RetentionDays.THREE_DAYS,
       ...props,
     });
