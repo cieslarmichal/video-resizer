@@ -1,6 +1,5 @@
 import { LoggerLevel } from '@video-resizer/backend';
 import * as core from 'aws-cdk-lib';
-import * as kms from 'aws-cdk-lib/aws-kms';
 import * as lambdaSources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
@@ -17,7 +16,6 @@ export class VideoProcessingStack extends core.Stack {
     const s3VideosBucket = new s3.Bucket(this, 'VideosBucket', {
       bucketName: 'videos-433862147055',
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      encryptionKey: new kms.Key(this, 'VideosBucketKMSKey'),
       removalPolicy: core.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
     });
@@ -25,7 +23,6 @@ export class VideoProcessingStack extends core.Stack {
     const s3ResizedVideosBucket = new s3.Bucket(this, 'ResizedVideosBucket', {
       bucketName: 'resized-videos-433862147055',
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-      encryptionKey: new kms.Key(this, 'ResizedVideosBucketKMSKey'),
       removalPolicy: core.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
     });
