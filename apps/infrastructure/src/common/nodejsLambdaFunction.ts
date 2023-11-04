@@ -14,7 +14,7 @@ export class NodejsLambdaFunction extends NodejsFunction {
         format: OutputFormat.ESM,
         banner: "import { createRequire } from 'module';const require = createRequire(import.meta.url);",
       },
-      architecture: lambda.Architecture.ARM_64,
+      architecture: lambda.Architecture.X86_64,
       runtime: lambda.Runtime.NODEJS_18_X,
       memorySize: 1024,
       tracing: lambda.Tracing.ACTIVE,
