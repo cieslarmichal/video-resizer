@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build:clean": "rimraf dist",
+    "start": "node --loader ts-node/esm src/index.ts",
     "build": "tsc --build tsconfig.build.json",
     "build:dev": "tsc --build tsconfig.json",
     "test:unit": "dotenv -e .env.test -- vitest .unit.test.ts --threads false",
