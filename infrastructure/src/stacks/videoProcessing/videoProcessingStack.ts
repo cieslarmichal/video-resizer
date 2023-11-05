@@ -111,14 +111,10 @@ export class VideoProcessingStack extends core.Stack {
               resources: [cluster.clusterArn],
               actions: ['ecs:DescribeTasks'],
             }),
-            new iam.PolicyStatement({
-              effect: iam.Effect.ALLOW,
-              resources: ['*'],
-              actions: ['ec2:*'],
-            }),
           ],
         }),
       },
+      managedPolicies: [iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole')],
     });
 
     const subnets = vpc.selectSubnets({
@@ -138,7 +134,6 @@ export class VideoProcessingStack extends core.Stack {
       entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/triggerVideoResizingTo360p/triggerVideoResizingTo360pLambdaHandler.ts`,
       environment: lambdaEnvironment,
       role: lambdaRole as iam.IRole,
-      vpc: vpc as ec2.IVpc,
     });
 
     triggerVideoResizingTo360pLambda.addEventSource(
@@ -150,7 +145,6 @@ export class VideoProcessingStack extends core.Stack {
     const triggerVideoResizingTo480pLambda = new NodejsLambdaFunction(this, 'TriggerVideoResizingTo480pLambda', {
       entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/triggerVideoResizingTo480p/triggerVideoResizingTo480pLambdaHandler.ts`,
       environment: lambdaEnvironment,
-      vpc: vpc as ec2.IVpc,
     });
 
     triggerVideoResizingTo480pLambda.addEventSource(
@@ -162,7 +156,6 @@ export class VideoProcessingStack extends core.Stack {
     const triggerVideoResizingTo720pLambda = new NodejsLambdaFunction(this, 'TriggerVideoResizingTo720pLambda', {
       entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/triggerVideoResizingTo720p/triggerVideoResizingTo720pLambdaHandler.ts`,
       environment: lambdaEnvironment,
-      vpc: vpc as ec2.IVpc,
     });
 
     triggerVideoResizingTo720pLambda.addEventSource(
