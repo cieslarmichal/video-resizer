@@ -27,7 +27,19 @@ export class FileTransferServiceImpl implements FileTransferService {
       });
     }
 
-    videoData.pipe(createWriteStream(destinationFilePath));
+    await new Promise((resolve, reject) => {
+      const destinationFile = createWriteStream(destinationFilePath);
+
+      videoData.on('error', reject);
+
+      destinationFile.on('error', reject);
+
+      destinationFile.on('finish', function () {
+        resolve('');
+      });
+
+      videoData.pipe(destinationFile);
+    });
   }
 
   public async uploadFileToS3(payload: UploadFileToS3Payload): Promise<void> {

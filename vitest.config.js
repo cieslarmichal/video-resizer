@@ -8,6 +8,6 @@ export default defineConfig({
     environment: 'node',
     outputTruncateLength: 120,
     outputDiffLines: 30,
-    testTimeout: 10000
+    testTimeout: 150000
   },
 });

@@ -1,4 +1,3 @@
-import { access, constants } from 'node:fs/promises';
 import path from 'node:path';
 
 import { type UploadResizedVideoCommandHandler, type ExecutePayload } from './uploadResizedVideoCommandHandler.js';
@@ -42,8 +41,6 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
     const s3ResizedVideoKey = `${parsedVideoPath.name}-${resolution}${parsedVideoPath.ext}`;
 
     const resizedVideoPath = `/tmp/${s3ResizedVideoKey}`;
-
-    await access('/opt/ffmpeg', constants.R_OK);
 
     await this.videoResizerService.resizeVideo({
       sourceFilePath: videoPath,

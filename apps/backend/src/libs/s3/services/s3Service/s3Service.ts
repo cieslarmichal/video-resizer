@@ -27,8 +27,8 @@ export interface CheckIfObjectExistsPayload {
 
 export interface S3Service {
   putObject(payload: PutObjectPayload): Promise<void>;
-  deleteObject(payload: GetObjectDataPayload): Promise<void>;
   getObjectData(payload: GetObjectDataPayload): Promise<Readable | undefined>;
+  deleteObject(payload: DeleteObjectPayload): Promise<void>;
   getObjectsKeys(payload: GetObjectsKeysPayload): Promise<string[]>;
   checkIfObjectExists(payload: CheckIfObjectExistsPayload): Promise<boolean>;
 }
