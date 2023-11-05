@@ -21,3 +21,5 @@ coverage
 .turbo
 
 **/*/testData/**
+
+.localstack
