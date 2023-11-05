@@ -82,7 +82,7 @@ export class VideoProcessingStack extends core.Stack {
     );
 
     const asset = new ecrAssets.DockerImageAsset(this, 'AppDockerImage', {
-      directory: join(process.cwd(), '..', '..', '..', '..', '..'),
+      directory: join(process.cwd(), '..', 'backend'),
     });
 
     const container = new ecs.ContainerDefinition(this, 'MyContainer', {
@@ -111,6 +111,11 @@ export class VideoProcessingStack extends core.Stack {
               resources: [cluster.clusterArn],
               actions: ['ecs:DescribeTasks'],
             }),
+            new iam.PolicyStatement({
+              effect: iam.Effect.ALLOW,
+              resources: ['*'],
+              actions: ['ec2:*'],
+            }),
           ],
         }),
       },
@@ -126,13 +131,14 @@ export class VideoProcessingStack extends core.Stack {
       ['SUBNET_IDS']: subnets.map((sub) => sub.subnetId).join(','),
       ['ECS_CONTAINER_NAME']: container.containerName,
       ['S3_RESIZED_VIDEOS_BUCKET']: s3ResizedVideosBucket.bucketName,
-      ['FFMPEG_PATH']: '/opt/ffmpeg',
+      ['FFMPEG_PATH']: '/usr/bin/ffmpeg',
     };
 
     const triggerVideoResizingTo360pLambda = new NodejsLambdaFunction(this, 'TriggerVideoResizingTo360pLambda', {
       entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/triggerVideoResizingTo360p/triggerVideoResizingTo360pLambdaHandler.ts`,
       environment: lambdaEnvironment,
       role: lambdaRole as iam.IRole,
+      vpc: vpc as ec2.IVpc,
     });
 
     triggerVideoResizingTo360pLambda.addEventSource(
@@ -144,6 +150,7 @@ export class VideoProcessingStack extends core.Stack {
     const triggerVideoResizingTo480pLambda = new NodejsLambdaFunction(this, 'TriggerVideoResizingTo480pLambda', {
       entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/triggerVideoResizingTo480p/triggerVideoResizingTo480pLambdaHandler.ts`,
       environment: lambdaEnvironment,
+      vpc: vpc as ec2.IVpc,
     });
 
     triggerVideoResizingTo480pLambda.addEventSource(
@@ -155,6 +162,7 @@ export class VideoProcessingStack extends core.Stack {
     const triggerVideoResizingTo720pLambda = new NodejsLambdaFunction(this, 'TriggerVideoResizingTo720pLambda', {
       entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/triggerVideoResizingTo720p/triggerVideoResizingTo720pLambdaHandler.ts`,
       environment: lambdaEnvironment,
+      vpc: vpc as ec2.IVpc,
     });
 
     triggerVideoResizingTo720pLambda.addEventSource(

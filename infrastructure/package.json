@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "build:clean": "rimraf dist",
-    "build": "tsc --build tsconfig.build.json",
+    "build": "tsc --build",
     "deploy": "dotenv -e .env cdk deploy",
     "deploy:all": "dotenv -e .env cdk deploy --all --require-approval never",
     "deploy:prepare": "dotenv -e .env -- cdk bootstrap --require-approval never",
