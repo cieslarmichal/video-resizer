@@ -11,6 +11,7 @@ import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as snsSubscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
+import { join } from 'path';
 
 import { NodejsLambdaFunction } from '../../common/nodejsLambdaFunction.js';
 
@@ -82,7 +83,7 @@ export class VideoProcessingStack extends core.Stack {
     );
 
     const asset = new ecrAssets.DockerImageAsset(this, 'AppDockerImage', {
-      directory: path.join(__dirname, '..', '..'),
+      directory: join(process.cwd(), '..', '..', '..', '..', '..'),
     });
 
     const container = new ecs.ContainerDefinition(this, 'MyContainer', {
@@ -130,35 +131,35 @@ export class VideoProcessingStack extends core.Stack {
       ['FFMPEG_PATH']: '/opt/ffmpeg',
     };
 
-    const resizeVideoTo360pLambda = new NodejsLambdaFunction(this, 'ResizeVideoTo360pLambda', {
-      entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/resizeVideoTo360p/resizeVideoTo360pLambdaHandler.ts`,
+    const triggerVideoResizingTo360pLambda = new NodejsLambdaFunction(this, 'TriggerVideoResizingTo360pLambda', {
+      entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/triggerVideoResizingTo360p/triggerVideoResizingTo360pLambdaHandler.ts`,
       environment: lambdaEnvironment,
       role: lambdaRole as iam.IRole,
     });
 
-    resizeVideoTo360pLambda.addEventSource(
+    triggerVideoResizingTo360pLambda.addEventSource(
       new lambdaSources.SqsEventSource(resizeVideoTo360pQueue, {
         batchSize: 1,
       }),
     );
 
-    const resizeVideoTo480pLambda = new NodejsLambdaFunction(this, 'ResizeVideoTo480pLambda', {
-      entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/resizeVideoTo480p/resizeVideoTo480pLambdaHandler.ts`,
+    const triggerVideoResizingTo480pLambda = new NodejsLambdaFunction(this, 'TriggerVideoResizingTo480pLambda', {
+      entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/triggerVideoResizingTo480p/triggerVideoResizingTo480pLambdaHandler.ts`,
       environment: lambdaEnvironment,
     });
 
-    resizeVideoTo480pLambda.addEventSource(
+    triggerVideoResizingTo480pLambda.addEventSource(
       new lambdaSources.SqsEventSource(resizeVideoTo480pQueue, {
         batchSize: 1,
       }),
     );
 
-    const resizeVideoTo720pLambda = new NodejsLambdaFunction(this, 'ResizeVideoTo720pLambda', {
-      entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/resizeVideoTo720p/resizeVideoTo720pLambdaHandler.ts`,
+    const triggerVideoResizingTo720pLambda = new NodejsLambdaFunction(this, 'TriggerVideoResizingTo720pLambda', {
+      entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/triggerVideoResizingTo720p/triggerVideoResizingTo720pLambdaHandler.ts`,
       environment: lambdaEnvironment,
     });
 
-    resizeVideoTo720pLambda.addEventSource(
+    triggerVideoResizingTo720pLambda.addEventSource(
       new lambdaSources.SqsEventSource(resizeVideoTo720pQueue, {
         batchSize: 1,
       }),
