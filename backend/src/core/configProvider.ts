@@ -68,4 +68,12 @@ export class ConfigProvider {
   public static getTargetResolution(): VideoResolution {
     return this.getEnumEnvVariable(VideoResolution, 'TARGET_RESOLUTION');
   }
+
+  public static getS3VideosBucket(): VideoResolution {
+    return this.getEnumEnvVariable(VideoResolution, 'S3_VIDEOS_BUCKET');
+  }
+
+  public static getS3VideoObjectKey(): VideoResolution {
+    return this.getEnumEnvVariable(VideoResolution, 'S3_VIDEO_OBJECT_KEY');
+  }
 }

@@ -7,6 +7,8 @@ import { LoggerServiceFactory } from '../libs/logger/factories/loggerServiceFact
 import { type LoggerService } from '../libs/logger/services/loggerService/loggerService.js';
 import { S3ServiceFactory } from '../libs/s3/factories/s3ServiceFactory/s3ServiceFactory.js';
 import { type S3Service } from '../libs/s3/services/s3Service/s3Service.js';
+import { type UploadResizedVideoCommandHandler } from '../modules/videoModule/application/commandHandlers/uploadResizedVideoCommandHandler/uploadResizedVideoCommandHandler.js';
+import { videoSymbols } from '../modules/videoModule/symbols.js';
 import { VideoModule } from '../modules/videoModule/videoModule.js';
 
 export class Application {
@@ -47,5 +49,25 @@ export class Application {
     );
 
     return container;
+  }
+
+  public static async start(): Promise<void> {
+    const container = Application.createContainer();
+
+    const s3VideosBucket = ConfigProvider.getS3VideosBucket();
+
+    const s3VideoKey = ConfigProvider.getS3VideoObjectKey();
+
+    const resolution = ConfigProvider.getTargetResolution();
+
+    const commandHandler = container.get<UploadResizedVideoCommandHandler>(
+      videoSymbols.uploadResizedVideoCommandHandler,
+    );
+
+    await commandHandler.execute({
+      s3VideosBucket,
+      s3VideoKey,
+      resolution,
+    });
   }
 }

@@ -1,6 +1,3 @@
-import { Video360pQueueController } from './api/queueHandlers/video360pQueueController/video360pQueueController.js';
-import { Video480pQueueController } from './api/queueHandlers/video480pQueueController/video480pQueueController.js';
-import { Video720pQueueController } from './api/queueHandlers/video720pQueueHandler/video720pQueueController.js';
 import { type UploadResizedVideoCommandHandler } from './application/commandHandlers/uploadResizedVideoCommandHandler/uploadResizedVideoCommandHandler.js';
 import { UploadResizedVideoCommandHandlerImpl } from './application/commandHandlers/uploadResizedVideoCommandHandler/uploadResizedVideoCommandHandlerImpl.js';
 import { type FileTransferService } from './application/services/fileTransferService/fileTransferService.js';
@@ -46,33 +43,6 @@ export class VideoModule implements DependencyInjectionModule {
           container.get<FileTransferService>(symbols.fileTransferService),
           container.get<VideoResizerService>(symbols.videoResizerService),
           container.get<VideoModuleConfig>(symbols.videoModuleConfig),
-          container.get<LoggerService>(coreSymbols.loggerService),
-        ),
-    );
-
-    container.bind<Video360pQueueController>(
-      symbols.video360pQueueController,
-      () =>
-        new Video360pQueueController(
-          container.get<UploadResizedVideoCommandHandler>(symbols.uploadResizedVideoCommandHandler),
-          container.get<LoggerService>(coreSymbols.loggerService),
-        ),
-    );
-
-    container.bind<Video480pQueueController>(
-      symbols.video480pQueueController,
-      () =>
-        new Video480pQueueController(
-          container.get<UploadResizedVideoCommandHandler>(symbols.uploadResizedVideoCommandHandler),
-          container.get<LoggerService>(coreSymbols.loggerService),
-        ),
-    );
-
-    container.bind<Video720pQueueController>(
-      symbols.video720pQueueController,
-      () =>
-        new Video720pQueueController(
-          container.get<UploadResizedVideoCommandHandler>(symbols.uploadResizedVideoCommandHandler),
           container.get<LoggerService>(coreSymbols.loggerService),
         ),
     );

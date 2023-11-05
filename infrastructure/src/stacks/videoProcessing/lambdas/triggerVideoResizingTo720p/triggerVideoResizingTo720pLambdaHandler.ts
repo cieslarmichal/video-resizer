@@ -79,11 +79,19 @@ export const lambda: Handler = async (sqsEvent: SQSEvent): Promise<void> => {
               environment: [
                 {
                   name: 'FFMPEG_PATH',
-                  value: '/usr/bin/ffmpeg',
+                  value: process.env['FFMPEG_PATH'] as string,
                 },
                 {
                   name: 'S3_RESIZED_VIDEOS_BUCKET',
                   value: process.env['S3_RESIZED_VIDEOS_BUCKET'] as string,
+                },
+                {
+                  name: 'S3_VIDEOS_BUCKET',
+                  value: bucket,
+                },
+                {
+                  name: 'S3_VIDEO_OBJECT_KEY',
+                  value: objectKey,
                 },
                 {
                   name: 'TARGET_RESOLUTION',
