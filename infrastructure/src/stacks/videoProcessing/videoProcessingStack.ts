@@ -145,6 +145,7 @@ export class VideoProcessingStack extends core.Stack {
     const triggerVideoResizingTo480pLambda = new NodejsLambdaFunction(this, 'TriggerVideoResizingTo480pLambda', {
       entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/triggerVideoResizingTo480p/triggerVideoResizingTo480pLambdaHandler.ts`,
       environment: lambdaEnvironment,
+      role: lambdaRole as iam.IRole,
     });
 
     triggerVideoResizingTo480pLambda.addEventSource(
@@ -156,6 +157,7 @@ export class VideoProcessingStack extends core.Stack {
     const triggerVideoResizingTo720pLambda = new NodejsLambdaFunction(this, 'TriggerVideoResizingTo720pLambda', {
       entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/triggerVideoResizingTo720p/triggerVideoResizingTo720pLambdaHandler.ts`,
       environment: lambdaEnvironment,
+      role: lambdaRole as iam.IRole,
     });
 
     triggerVideoResizingTo720pLambda.addEventSource(
