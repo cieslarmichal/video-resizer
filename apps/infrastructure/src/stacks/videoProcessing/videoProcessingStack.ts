@@ -1,6 +1,10 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { LoggerLevel } from '@video-resizer/backend';
 import * as core from 'aws-cdk-lib';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as ecrAssets from 'aws-cdk-lib/aws-ecr-assets';
+import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as lambdaSources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
@@ -53,27 +57,84 @@ export class VideoProcessingStack extends core.Stack {
 
     topic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo720pQueue));
 
+    const vpc = new ec2.Vpc(this, 'VPC', {
+      natGateways: 2,
+      maxAzs: 2,
+    });
+
+    const cluster = new ecs.Cluster(this, 'ECSCluster', {
+      vpc: vpc as ec2.IVpc,
+      containerInsights: true,
+    });
+
+    const ecsTaskDefinition = new ecs.TaskDefinition(this, `ECSTaskDefinition`, {
+      compatibility: ecs.Compatibility.FARGATE,
+      cpu: '16384',
+      memoryMiB: '32768',
+    });
+
+    ecsTaskDefinition.addToTaskRolePolicy(
+      new iam.PolicyStatement({
+        effect: iam.Effect.ALLOW,
+        actions: ['s3:*'],
+        resources: ['*'],
+      }),
+    );
+
+    const asset = new ecrAssets.DockerImageAsset(this, 'AppDockerImage', {
+      directory: path.join(__dirname, '..', '..'),
+    });
+
+    const container = new ecs.ContainerDefinition(this, 'MyContainer', {
+      image: ecs.ContainerImage.fromDockerImageAsset(asset),
+      taskDefinition: ecsTaskDefinition,
+      logging: ecs.LogDriver.awsLogs({ streamPrefix: `${props?.stackName}-container-logs` }),
+    });
+
+    const lambdaRole = new iam.Role(this, 'lambda-role', {
+      assumedBy: new iam.AnyPrincipal() as iam.IPrincipal,
+      inlinePolicies: {
+        'inline-lambda-trigger-policy': new iam.PolicyDocument({
+          statements: [
+            new iam.PolicyStatement({
+              effect: iam.Effect.ALLOW,
+              resources: [ecsTaskDefinition.taskDefinitionArn],
+              actions: ['ecs:RunTask'],
+            }),
+            new iam.PolicyStatement({
+              effect: iam.Effect.ALLOW,
+              resources: ['*'],
+              actions: ['iam:PassRole'],
+            }),
+            new iam.PolicyStatement({
+              effect: iam.Effect.ALLOW,
+              resources: [cluster.clusterArn],
+              actions: ['ecs:DescribeTasks'],
+            }),
+          ],
+        }),
+      },
+    });
+
+    const subnets = vpc.selectSubnets({
+      subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+    }).subnets;
+
     const lambdaEnvironment = {
+      ['ECS_TASK_ARN']: ecsTaskDefinition.taskDefinitionArn,
+      ['ECS_CLUSTER_ARN']: cluster.clusterArn,
+      ['SUBNET_IDS']: subnets.map((sub) => sub.subnetId).join(','),
+      ['ECS_CONTAINER_NAME']: container.containerName,
       ['S3_RESIZED_VIDEOS_BUCKET']: s3ResizedVideosBucket.bucketName,
       ['LOGGER_LEVEL']: LoggerLevel.debug,
       ['FFMPEG_PATH']: '/opt/ffmpeg',
     };
 
-    const ffmegLayer = new lambda.LayerVersion(this, 'ffmpeg-layer', {
-      layerVersionName: 'ffmpeg',
-      compatibleRuntimes: [lambda.Runtime.NODEJS_18_X],
-      code: lambda.AssetCode.fromAsset(`${process.cwd()}/src/stacks/videoProcessing/ffmpegLambdaLayer`),
-    });
-
     const resizeVideoTo360pLambda = new NodejsLambdaFunction(this, 'ResizeVideoTo360pLambda', {
       entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/resizeVideoTo360p/resizeVideoTo360pLambdaHandler.ts`,
       environment: lambdaEnvironment,
-      layers: [ffmegLayer],
+      role: lambdaRole as iam.IRole,
     });
-
-    s3VideosBucket.grantRead(resizeVideoTo360pLambda);
-
-    s3ResizedVideosBucket.grantReadWrite(resizeVideoTo360pLambda);
 
     resizeVideoTo360pLambda.addEventSource(
       new lambdaSources.SqsEventSource(resizeVideoTo360pQueue, {
@@ -84,12 +145,7 @@ export class VideoProcessingStack extends core.Stack {
     const resizeVideoTo480pLambda = new NodejsLambdaFunction(this, 'ResizeVideoTo480pLambda', {
       entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/resizeVideoTo480p/resizeVideoTo480pLambdaHandler.ts`,
       environment: lambdaEnvironment,
-      layers: [ffmegLayer],
     });
-
-    s3VideosBucket.grantRead(resizeVideoTo480pLambda);
-
-    s3ResizedVideosBucket.grantReadWrite(resizeVideoTo480pLambda);
 
     resizeVideoTo480pLambda.addEventSource(
       new lambdaSources.SqsEventSource(resizeVideoTo480pQueue, {
@@ -100,12 +156,7 @@ export class VideoProcessingStack extends core.Stack {
     const resizeVideoTo720pLambda = new NodejsLambdaFunction(this, 'ResizeVideoTo720pLambda', {
       entry: `${process.cwd()}/src/stacks/videoProcessing/lambdas/resizeVideoTo720p/resizeVideoTo720pLambdaHandler.ts`,
       environment: lambdaEnvironment,
-      layers: [ffmegLayer],
     });
-
-    s3VideosBucket.grantRead(resizeVideoTo720pLambda);
-
-    s3ResizedVideosBucket.grantReadWrite(resizeVideoTo720pLambda);
 
     resizeVideoTo720pLambda.addEventSource(
       new lambdaSources.SqsEventSource(resizeVideoTo720pQueue, {
