@@ -186,14 +186,14 @@ export class VideoProcessingStack extends core.Stack {
           namespace: 'ECS/ContainerInsights',
           metricName: 'CpuUtilized',
           statistic: 'Average',
-          period: core.Duration.minutes(1),
+          period: core.Duration.seconds(30),
           dimensionsMap: { ClusterName: cluster.clusterName },
         }),
         reserved: new cloudwatch.Metric({
           namespace: 'ECS/ContainerInsights',
           metricName: 'CpuReserved',
           statistic: 'Average',
-          period: core.Duration.minutes(1),
+          period: core.Duration.seconds(30),
           dimensionsMap: { ClusterName: cluster.clusterName },
         }),
       },
@@ -201,7 +201,7 @@ export class VideoProcessingStack extends core.Stack {
 
     const highCpuAlarm = new cloudwatch.Alarm(this, 'HighCpuAlarm', {
       metric: cpuPercentUsed,
-      threshold: 0.85,
+      threshold: 0.9,
       evaluationPeriods: 1,
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
     });
@@ -213,14 +213,14 @@ export class VideoProcessingStack extends core.Stack {
           namespace: 'ECS/ContainerInsights',
           metricName: 'MemoryUtilized',
           statistic: 'Average',
-          period: core.Duration.minutes(1),
+          period: core.Duration.seconds(30),
           dimensionsMap: { ClusterName: cluster.clusterName },
         }),
         reserved: new cloudwatch.Metric({
           namespace: 'ECS/ContainerInsights',
           metricName: 'MemoryReserved',
           statistic: 'Average',
-          period: core.Duration.minutes(1),
+          period: core.Duration.seconds(30),
           dimensionsMap: { ClusterName: cluster.clusterName },
         }),
       },
@@ -228,7 +228,7 @@ export class VideoProcessingStack extends core.Stack {
 
     const highMemoryAlarm = new cloudwatch.Alarm(this, 'HighMemoryAlarm', {
       metric: memoryPercentUsed,
-      threshold: 0.85,
+      threshold: 0.9,
       evaluationPeriods: 1,
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
     });
