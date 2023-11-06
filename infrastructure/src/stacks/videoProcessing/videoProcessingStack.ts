@@ -78,8 +78,8 @@ export class VideoProcessingStack extends core.Stack {
 
     const ecsTaskDefinition = new ecs.TaskDefinition(this, `ECSTaskDefinition`, {
       compatibility: ecs.Compatibility.FARGATE,
-      cpu: '1024',
-      memoryMiB: '2048',
+      cpu: '2048',
+      memoryMiB: '4096',
     });
 
     ecsTaskDefinition.addToTaskRolePolicy(
