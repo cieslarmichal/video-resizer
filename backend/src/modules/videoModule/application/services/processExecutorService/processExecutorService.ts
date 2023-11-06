@@ -1,3 +1,3 @@
 export interface ProcessExecutorService {
-  execute(command: string, args: string[]): Promise<string>;
+  execute(command: string, args: string[]): Promise<void>;
 }
