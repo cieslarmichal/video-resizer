@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+
 import * as core from 'aws-cdk-lib';
+import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
+import * as cloudwatchActions from 'aws-cdk-lib/aws-cloudwatch-actions';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecrAssets from 'aws-cdk-lib/aws-ecr-assets';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
@@ -14,9 +17,15 @@ import { join } from 'path';
 
 import { NodejsLambdaFunction } from '../../common/nodejsLambdaFunction.js';
 
+interface VideoProcessingStackProps extends core.StackProps {
+  readonly alertEmail: string;
+}
+
 export class VideoProcessingStack extends core.Stack {
-  public constructor(scope: core.App, id: string, props: core.StackProps) {
+  public constructor(scope: core.App, id: string, props: VideoProcessingStackProps) {
     super(scope, id, props);
+
+    const { alertEmail } = props;
 
     const s3VideosBucket = new s3.Bucket(this, 'VideosBucket', {
       bucketName: 'videos-433862147055',
@@ -32,30 +41,30 @@ export class VideoProcessingStack extends core.Stack {
       autoDeleteObjects: true,
     });
 
-    const topic = new sns.Topic(this, 'CreatedVideos');
+    const createdVideosTopic = new sns.Topic(this, 'CreatedVideos');
 
-    s3VideosBucket.addEventNotification(s3.EventType.OBJECT_CREATED, new s3n.SnsDestination(topic));
+    s3VideosBucket.addEventNotification(s3.EventType.OBJECT_CREATED, new s3n.SnsDestination(createdVideosTopic));
 
     const resizeVideoTo360pQueue = new sqs.Queue(this, 'ResizeVideoTo360pQueue', {
       queueName: 'ResizeVideoTo360pQueue',
       visibilityTimeout: core.Duration.minutes(15),
     });
 
-    topic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo360pQueue));
+    createdVideosTopic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo360pQueue));
 
     const resizeVideoTo480pQueue = new sqs.Queue(this, 'ResizeVideoTo480pQueue', {
       queueName: 'ResizeVideoTo480pQueue',
       visibilityTimeout: core.Duration.minutes(15),
     });
 
-    topic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo480pQueue));
+    createdVideosTopic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo480pQueue));
 
     const resizeVideoTo720pQueue = new sqs.Queue(this, 'ResizeVideoTo720pQueue', {
       queueName: 'ResizeVideoTo720pQueue',
       visibilityTimeout: core.Duration.minutes(15),
     });
 
-    topic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo720pQueue));
+    createdVideosTopic.addSubscription(new snsSubscriptions.SqsSubscription(resizeVideoTo720pQueue));
 
     const vpc = new ec2.Vpc(this, 'VPC', {
       natGateways: 2,
@@ -76,7 +85,7 @@ export class VideoProcessingStack extends core.Stack {
     ecsTaskDefinition.addToTaskRolePolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
-        actions: ['s3:*'],
+        actions: ['s3:*', 'ecs:*'],
         resources: ['*'],
       }),
     );
@@ -85,13 +94,13 @@ export class VideoProcessingStack extends core.Stack {
       directory: join(process.cwd(), '..', 'backend'),
     });
 
-    const container = new ecs.ContainerDefinition(this, 'MyContainer', {
+    const container = new ecs.ContainerDefinition(this, 'Container', {
       image: ecs.ContainerImage.fromDockerImageAsset(asset),
       taskDefinition: ecsTaskDefinition,
-      logging: ecs.LogDriver.awsLogs({ streamPrefix: `${props?.stackName}-container-logs` }),
+      logging: ecs.LogDriver.awsLogs({ streamPrefix: 'container-logs' }),
     });
 
-    const lambdaRole = new iam.Role(this, 'lambda-role', {
+    const lambdaRole = new iam.Role(this, 'LambdaRole', {
       assumedBy: new iam.AnyPrincipal() as iam.IPrincipal,
       inlinePolicies: {
         'inline-lambda-trigger-policy': new iam.PolicyDocument({
@@ -165,5 +174,67 @@ export class VideoProcessingStack extends core.Stack {
         batchSize: 1,
       }),
     );
+
+    const alarmTopic = new sns.Topic(this, 'Alarm topic', { displayName: `video-processing-alarm-topic` });
+
+    alarmTopic.addSubscription(new snsSubscriptions.EmailSubscription(alertEmail));
+
+    const cpuPercentUsed = new cloudwatch.MathExpression({
+      expression: 'utilized / reserved',
+      usingMetrics: {
+        utilized: new cloudwatch.Metric({
+          namespace: 'ECS/ContainerInsights',
+          metricName: 'CpuUtilized',
+          statistic: 'Average',
+          period: core.Duration.minutes(1),
+          dimensionsMap: { ClusterName: cluster.clusterName },
+        }),
+        reserved: new cloudwatch.Metric({
+          namespace: 'ECS/ContainerInsights',
+          metricName: 'CpuReserved',
+          statistic: 'Average',
+          period: core.Duration.minutes(1),
+          dimensionsMap: { ClusterName: cluster.clusterName },
+        }),
+      },
+    });
+
+    const highCpuAlarm = new cloudwatch.Alarm(this, 'HighCpuAlarm', {
+      metric: cpuPercentUsed,
+      threshold: 0.85,
+      evaluationPeriods: 1,
+      comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
+    });
+
+    const memoryPercentUsed = new cloudwatch.MathExpression({
+      expression: 'utilized / reserved',
+      usingMetrics: {
+        utilized: new cloudwatch.Metric({
+          namespace: 'ECS/ContainerInsights',
+          metricName: 'MemoryUtilized',
+          statistic: 'Average',
+          period: core.Duration.minutes(1),
+          dimensionsMap: { ClusterName: cluster.clusterName },
+        }),
+        reserved: new cloudwatch.Metric({
+          namespace: 'ECS/ContainerInsights',
+          metricName: 'MemoryReserved',
+          statistic: 'Average',
+          period: core.Duration.minutes(1),
+          dimensionsMap: { ClusterName: cluster.clusterName },
+        }),
+      },
+    });
+
+    const highMemoryAlarm = new cloudwatch.Alarm(this, 'HighMemoryAlarm', {
+      metric: memoryPercentUsed,
+      threshold: 0.85,
+      evaluationPeriods: 1,
+      comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
+    });
+
+    highMemoryAlarm.addAlarmAction(new cloudwatchActions.SnsAction(alarmTopic));
+
+    highCpuAlarm.addAlarmAction(new cloudwatchActions.SnsAction(alarmTopic));
   }
 }

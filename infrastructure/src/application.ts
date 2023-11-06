@@ -8,12 +8,15 @@ const awsRegion = process.env['AWS_REGION'] || process.env['AWS_DEFAULT_REGION']
 
 const awsAccount = process.env['AWS_ACCOUNT_ID'];
 
+const alertEmail = process.env['ALERT_EMAIL'];
+
 console.log({
   awsRegion,
   awsAccount,
+  alertEmail,
 });
 
-if (!awsRegion || !awsAccount) {
+if (!awsRegion || !awsAccount || !alertEmail) {
   throw new Error('Missing environment variables');
 }
 
@@ -24,4 +27,5 @@ new VideoProcessingStack(app, 'VideoProcessingStack', {
     account: awsAccount,
     region: awsRegion,
   },
+  alertEmail,
 });
