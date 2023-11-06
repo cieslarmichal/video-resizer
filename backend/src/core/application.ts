@@ -54,8 +54,6 @@ export class Application {
   public static async start(): Promise<void> {
     const container = Application.createContainer();
 
-    console.log(process.env);
-
     const s3VideosBucket = ConfigProvider.getS3VideosBucket();
 
     const s3VideoKey = ConfigProvider.getS3VideoObjectKey();
