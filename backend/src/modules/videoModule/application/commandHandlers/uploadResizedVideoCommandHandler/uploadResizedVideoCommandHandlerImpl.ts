@@ -19,6 +19,15 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
 
     const videoPath = `/tmp/${s3VideoKey}`;
 
+    this.loggerService.debug({
+      message: 'Downloading video...',
+      context: {
+        bucket: s3VideosBucket,
+        objectKey: s3VideoKey,
+        videoPath,
+      },
+    });
+
     await this.fileTransferService.downloadFileFromS3({
       s3Bucket: s3VideosBucket,
       s3ObjectKey: s3VideoKey,
@@ -42,6 +51,15 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
 
     const resizedVideoPath = `/tmp/${s3ResizedVideoKey}`;
 
+    this.loggerService.info({
+      message: 'Resizing video...',
+      context: {
+        videoPath,
+        resizedVideoPath,
+        resolution,
+      },
+    });
+
     await this.videoResizerService.resizeVideo({
       sourceFilePath: videoPath,
       destinationFilePath: resizedVideoPath,
@@ -58,6 +76,15 @@ export class UploadResizedVideoCommandHandlerImpl implements UploadResizedVideoC
     });
 
     const { s3ResizedVideosBucket } = this.config;
+
+    this.loggerService.info({
+      message: 'Uploading resized video...',
+      context: {
+        bucket: s3ResizedVideosBucket,
+        objectKey: s3ResizedVideoKey,
+        resizedVideoPath,
+      },
+    });
 
     await this.fileTransferService.uploadFileToS3({
       s3Bucket: s3ResizedVideosBucket,
