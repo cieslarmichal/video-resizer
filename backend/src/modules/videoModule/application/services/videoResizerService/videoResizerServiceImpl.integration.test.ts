@@ -19,7 +19,7 @@ describe('VideoResizerServiceImpl', () => {
 
   let videoResizerService: VideoResizerService;
 
-  const resourcesDirectory = join(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', 'resources');
+  const resourcesDirectory = join(__dirname, '..', '..', '..', '..', '..', '..', '..', 'resources');
 
   const testDataDirectory = join(__dirname, 'testData');
 

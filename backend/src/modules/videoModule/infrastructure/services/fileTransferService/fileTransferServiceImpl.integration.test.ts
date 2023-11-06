@@ -19,7 +19,7 @@ describe('FileTransferServiceImpl', () => {
 
   let s3Service: S3Service;
 
-  const resourcesDirectory = join(__dirname, '..', '..', '..', '..', '..', '..', '..', '..', 'resources');
+  const resourcesDirectory = join(__dirname, '..', '..', '..', '..', '..', '..', '..', 'resources');
 
   const testDataDirectory = join(__dirname, 'testData');
 
